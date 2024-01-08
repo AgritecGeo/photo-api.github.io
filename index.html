@@ -7,15 +7,16 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Proyecto de Interacción con API</h1>
+    <h1>¡Carga y Toma de Imágenes!</h1>
 
     <!-- Para cargar imágenes -->
     <input type="file" id="imageLoader" name="imageLoader" accept="image/*"/>
 
-    <!-- Para tomar imágenes con la cámara -->
-    <button id="cameraButton">Tomar Foto</button>
+    <!-- Para activar y tomar imágenes con la cámara -->
+    <button id="cameraButton">Activar Cámara</button>
     <video id="video" style="display:none;"></video>
     <canvas id="canvas" style="display:none;"></canvas>
+    <button id="takePhotoButton" style="display:none;">Tomar Foto</button>
 
     <!-- Contenedor de imágenes previsualizadas -->
     <div id="imagePreviewContainer"></div>
