@@ -6,30 +6,31 @@ document.addEventListener("DOMContentLoaded", function() {
         handleImage(e, addImageToPreview);
     }, false);
 
-    // Configurar cámara
+    // Configuración de la cámara y botones
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');
     const cameraButton = document.getElementById('cameraButton');
+    const takePhotoButton = document.getElementById('takePhotoButton');
 
     // Activar cámara
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
-            video.srcObject = stream;
-            video.play();
-            video.style.display = 'block';
-        });
-    }
+    cameraButton.addEventListener('click', function() {
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+                video.srcObject = stream;
+                video.play();
+                video.style.display = 'block';
+                takePhotoButton.style.display = 'block';
+            });
+        }
+    });
 
     // Tomar foto
-    cameraButton.addEventListener('click', function() {
-        if (video.style.display !== 'none') {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            video.style.display = 'none';
-            handleImage({target: {files: [canvas.toDataURL('image/png')]}}, addImageToPreview);
-        }
+    takePhotoButton.addEventListener('click', function() {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        handleImage({target: {files: [canvas.toDataURL('image/png')]}}, addImageToPreview);
     });
 
     // Función para manejar imágenes y agregar previsualización
@@ -63,8 +64,6 @@ document.addEventListener("DOMContentLoaded", function() {
         } else {
             addToTable(src, datetime, latitude, longitude, imageCount);
         }
-
-        // Código existente para la previsualización
     }
 
     // Función para agregar detalles a la tabla
@@ -81,6 +80,6 @@ document.addEventListener("DOMContentLoaded", function() {
         newRow.insertCell(1).textContent = datetime;
         newRow.insertCell(2).textContent = latitude;
         newRow.insertCell(3).textContent = longitude;
-        newRow.insertCell(4).textContent = `Foto ${count} - ${datetime} - ${navigator.userAgent}`;
+        newRow.insertCell(4).textContent = `Foto ${count}`;
     }
 });
