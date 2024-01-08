@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interacción con API</title>
+    <title>Mi Página Web</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Carga de imágenes</h1>
+    <h1>Proyecto de Interacción con API</h1>
 
     <!-- Para cargar imágenes -->
     <input type="file" id="imageLoader" name="imageLoader" accept="image/*"/>
@@ -20,9 +20,20 @@
     <!-- Contenedor de imágenes previsualizadas -->
     <div id="imagePreviewContainer"></div>
 
-    <!-- Mostrar ubicación y fecha/hora -->
-    <p id="location"></p>
-    <p id="datetime"></p>
+    <!-- Tabla para mostrar detalles de las imágenes -->
+    <table id="imageDetailsTable">
+        <thead>
+            <tr>
+                <th>Miniatura</th>
+                <th>Fecha y Hora</th>
+                <th>Latitud</th>
+                <th>Longitud</th>
+                <th>Correlativo</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
 
     <script src="script.js"></script>
 </body>
