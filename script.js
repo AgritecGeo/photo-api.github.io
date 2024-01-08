@@ -33,6 +33,11 @@ document.addEventListener("DOMContentLoaded", function() {
         handleImage({target: {files: [canvas.toDataURL('image/png')]}}, addImageToPreview);
     });
 
+    // Botón para enviar a Plantix
+    document.getElementById('sendToPlantixButton').addEventListener('click', function() {
+        sendImagesToPlantix();
+    });
+
     // Función para manejar imágenes y agregar previsualización
     function handleImage(e, callback) {
         const reader = new FileReader();
@@ -81,5 +86,36 @@ document.addEventListener("DOMContentLoaded", function() {
         newRow.insertCell(2).textContent = latitude;
         newRow.insertCell(3).textContent = longitude;
         newRow.insertCell(4).textContent = `Foto ${count}`;
+    }
+
+    // Función para enviar imágenes a Plantix
+    function sendImagesToPlantix() {
+        const images = document.querySelectorAll('#imagePreviewContainer img');
+        images.forEach((img, index) => {
+            const imageData = img.src;
+            if (imageData) {
+                sendImageToPlantixApi(imageData, index);
+            }
+        });
+    }
+
+    function sendImageToPlantixApi(imageData, index) {
+        const url = 'https://api.plantix.net/v2/image_analysis';
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', url, true);
+        xhr.setRequestHeader('Authorization', 'Bearer 2b0080cfd58f564046a1104db36c9163091c2a07');
+        xhr.setRequestHeader('Content-Type', 'multipart/form-data');
+
+        const formData = new FormData();
+        formData.append('image', imageData);
+        formData.append('application_used_image_gallery', false);
+
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                console.log('Imagen ' + index + ' enviada con éxito');
+                // Aquí podrías manejar la respuesta de la API
+            }
+        }
+        xhr.send(formData);
     }
 });
