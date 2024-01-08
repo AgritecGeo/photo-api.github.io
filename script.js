@@ -111,9 +111,15 @@ document.addEventListener("DOMContentLoaded", function() {
         formData.append('application_used_image_gallery', false);
 
         xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4 && xhr.status == 200) {
-                console.log('Imagen ' + index + ' enviada con éxito');
-                // Aquí podrías manejar la respuesta de la API
+            if (xhr.readyState == 4) {
+                const responseContainer = document.getElementById('apiResponseContainer');
+                if (xhr.status == 200) {
+                    console.log('Imagen ' + index + ' enviada con éxito');
+                    responseContainer.innerHTML += `<p>Respuesta para imagen ${index}: ${xhr.responseText}</p>`;
+                } else {
+                    console.log('Error al enviar imagen ' + index);
+                    responseContainer.innerHTML += `<p>Error al enviar imagen ${index}: ${xhr.statusText}</p>`;
+                }
             }
         }
         xhr.send(formData);
