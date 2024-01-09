@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const context = canvas.getContext('2d');
     const cameraButton = document.getElementById('cameraButton');
     const takePhotoButton = document.getElementById('takePhotoButton');
+    const sendToAPIButton = document.getElementById('sendImageToAPI'); // Botón para enviar la imagen a la API y descargar CSV
 
     // Activar cámara
     cameraButton.addEventListener('click', function() {
@@ -81,5 +82,57 @@ document.addEventListener("DOMContentLoaded", function() {
         newRow.insertCell(2).textContent = latitude;
         newRow.insertCell(3).textContent = longitude;
         newRow.insertCell(4).textContent = `Foto ${count}`;
+    }
+
+    // Función para enviar la imagen a la API y descargar la respuesta como un archivo CSV
+    sendToAPIButton.addEventListener('click', function() {
+        // Obtener la imagen actual
+        const currentImage = document.querySelector("#imageDetailsTable tbody tr:last-child img");
+        
+        // Verificar si hay una imagen cargada
+        if (currentImage) {
+            // Crear un objeto FormData y agregar la imagen
+            const formData = new FormData();
+            formData.append('image', currentImage.src);
+
+            // Realizar la solicitud a la API
+            fetch('https://api.plantix.net/v2/image_analysis', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Generar el archivo CSV y descargarlo
+                const csv = generateCSV(data);
+                downloadCSV(csv);
+            })
+            .catch(error => console.error('Error:', error));
+        } else {
+            alert("No hay una imagen cargada para enviar a la API.");
+        }
+    });
+
+    // Función para generar el contenido del archivo CSV a partir de los datos de la API
+    function generateCSV(data) {
+        // Aquí debes implementar la generación del CSV a partir de los datos de la API
+        // Por ejemplo, podrías usar la librería "csv-parser" para convertir los datos en CSV
+        // y luego devolverlo como una cadena de texto.
+        // Aquí se muestra un ejemplo simplificado:
+
+        const csvData = "Columna1,Columna2,Columna3\n"; // Reemplaza con tus columnas y datos reales
+        return csvData;
+    }
+
+    // Función para descargar un archivo CSV
+    function downloadCSV(csv) {
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'respuesta_api.csv'; // Nombre del archivo CSV
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
     }
 });
