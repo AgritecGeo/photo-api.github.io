@@ -112,16 +112,33 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // Función para generar el contenido del archivo CSV a partir de los datos de la API
-    function generateCSV(data) {
-        // Aquí debes implementar la generación del CSV a partir de los datos de la API
-        // Por ejemplo, podrías usar la librería "csv-parser" para convertir los datos en CSV
-        // y luego devolverlo como una cadena de texto.
-        // Aquí se muestra un ejemplo simplificado:
+   // Función para generar el contenido del archivo CSV a partir de los datos de la respuesta de la API
+function generateCSV(data) {
+    // Crear una cadena de encabezado CSV
+    let csvData = 'Crop Health,Crops,Diagnoses,Diagnosis Likelihood,Scientific Name,Symptoms,Treatment (Chemical),Treatment (Organic)\n';
 
-        const csvData = "Columna1,Columna2,Columna3\n"; // Reemplaza con tus columnas y datos reales
-        return csvData;
+    // Iterar a través de los diagnósticos predichos en la respuesta de la API
+    for (const diagnosis of data.predicted_diagnoses) {
+        const cropHealth = data.crop_health;
+        const crops = diagnosis.hosts.join(', '); // Convertir la matriz de cultivos en una cadena
+        const commonName = diagnosis.common_name;
+        const diagnosisLikelihood = diagnosis.diagnosis_likelihood;
+        const scientificName = diagnosis.scientific_name;
+        const symptoms = diagnosis.symptoms;
+        const treatmentChemical = diagnosis.treatment_chemical;
+        const treatmentOrganic = diagnosis.treatment_organic;
+
+        // Escapar las comas en los campos de texto
+        const escapedSymptoms = symptoms.replace(/,/g, ';');
+        const escapedTreatmentChemical = treatmentChemical.replace(/,/g, ';');
+        const escapedTreatmentOrganic = treatmentOrganic.replace(/,/g, ';');
+
+        // Agregar una fila al archivo CSV
+        csvData += `${cropHealth},${crops},${commonName},${diagnosisLikelihood},${scientificName},"${escapedSymptoms}","${escapedTreatmentChemical}","${escapedTreatmentOrganic}"\n`;
     }
+
+    return csvData;
+}
 
     // Función para descargar un archivo CSV
     function downloadCSV(csv) {
