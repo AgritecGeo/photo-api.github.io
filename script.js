@@ -1,6 +1,9 @@
 document.addEventListener("DOMContentLoaded", function() {
     let imageCount = 0; // Contador para el correlativo de imágenes
 
+    // Lista de cultivos
+    const cropsList = ["apple", "banana", "bean", "carrot", "cabbage", "cauliflower", "citrus", "coffee", "cucumber", "eggplant", "corn", "mango", "melon", "pepper", "peach", "papaya", "onion", "potato", "rice", "sorghum", "soy", "strawberries", "cane", "sweet potato", "tomato", "wheat", "zucchini"];
+
     // Manejar carga de imagen
     document.getElementById('imageLoader').addEventListener('change', function(e) {
         handleImage(e, addImageToPreview);
@@ -12,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const context = canvas.getContext('2d');
     const cameraButton = document.getElementById('cameraButton');
     const takePhotoButton = document.getElementById('takePhotoButton');
-    const sendToAPIButton = document.getElementById('sendImageToAPI'); // Botón para enviar la imagen a la API y descargar CSV
+    const sendToAPIButton = document.getElementById('sendAndDownloadButton'); // Botón para enviar la imagen a la API y descargar CSV
 
     // Activar cámara
     cameraButton.addEventListener('click', function() {
@@ -72,16 +75,39 @@ document.addEventListener("DOMContentLoaded", function() {
         const table = document.getElementById('imageDetailsTable').getElementsByTagName('tbody')[0];
         const newRow = table.insertRow();
 
+        // Columna de miniatura
         const cellThumbnail = newRow.insertCell(0);
         const thumbnail = new Image();
         thumbnail.src = src;
         thumbnail.style.width = '50px';
         cellThumbnail.appendChild(thumbnail);
 
+        // Columnas de fecha, latitud, longitud y correlativo
         newRow.insertCell(1).textContent = datetime;
         newRow.insertCell(2).textContent = latitude;
         newRow.insertCell(3).textContent = longitude;
         newRow.insertCell(4).textContent = `Foto ${count}`;
+
+        // Columna de selección de cultivo
+        const cropSelectCell = newRow.insertCell(5);
+        const cropSelect = document.createElement('select');
+        cropsList.forEach(crop => {
+            const option = document.createElement('option');
+            option.value = crop;
+            option.textContent = crop;
+            cropSelect.appendChild(option);
+        });
+        cropSelectCell.appendChild(cropSelect);
+
+        // Columnas para respuesta de la API y opciones Verdadero/Falso
+        newRow.insertCell(6); // Respuesta de la API
+        const trueFalseCell = newRow.insertCell(7);
+        const trueButton = document.createElement('button');
+        trueButton.textContent = 'Verdadero';
+        const falseButton = document.createElement('button');
+        falseButton.textContent = 'Falso';
+        trueFalseCell.appendChild(trueButton);
+        trueFalseCell.appendChild(falseButton);
     }
 
     // Función para enviar la imagen a la API y descargar la respuesta como un archivo CSV
@@ -96,15 +122,14 @@ document.addEventListener("DOMContentLoaded", function() {
             formData.append('image', currentImage.src);
 
             // Realizar la solicitud a la API
-            fetch('https://api.plantix.net/v2/image_analysis', {
+            fetch('https://api.example.com/image_analysis', {
                 method: 'POST',
                 body: formData,
             })
             .then(response => response.json())
             .then(data => {
-                // Generar el archivo CSV y descargarlo
-                const csv = generateCSV(data);
-                downloadCSV(csv);
+                // Aquí puedes manejar la respuesta de la API y actualizar la tabla
+                // Por ejemplo, agregar la respuesta a la columna correspondiente
             })
             .catch(error => console.error('Error:', error));
         } else {
@@ -112,113 +137,5 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-   // Función para generar el contenido del archivo CSV a partir de los datos de la respuesta de la API
-function generateCSV(data) {
-    // Crear una cadena de encabezado CSV
-    let csvData = 'Crop Health,Crops,Diagnoses,Diagnosis Likelihood,Scientific Name,Symptoms,Treatment (Chemical),Treatment (Organic)\n';
-
-    // Iterar a través de los diagnósticos predichos en la respuesta de la API
-    for (const diagnosis of data.predicted_diagnoses) {
-        const cropHealth = data.crop_health;
-        const crops = diagnosis.hosts.join(', '); // Convertir la matriz de cultivos en una cadena
-        const commonName = diagnosis.common_name;
-        const diagnosisLikelihood = diagnosis.diagnosis_likelihood;
-        const scientificName = diagnosis.scientific_name;
-        const symptoms = diagnosis.symptoms;
-        const treatmentChemical = diagnosis.treatment_chemical;
-        const treatmentOrganic = diagnosis.treatment_organic;
-
-        // Escapar las comas en los campos de texto
-        const escapedSymptoms = symptoms.replace(/,/g, ';');
-        const escapedTreatmentChemical = treatmentChemical.replace(/,/g, ';');
-        const escapedTreatmentOrganic = treatmentOrganic.replace(/,/g, ';');
-
-        // Agregar una fila al archivo CSV
-        csvData += `${cropHealth},${crops},${commonName},${diagnosisLikelihood},${scientificName},"${escapedSymptoms}","${escapedTreatmentChemical}","${escapedTreatmentOrganic}"\n`;
-    }
-
-    return csvData;
-}
-
-    // Función para descargar un archivo CSV
-    function downloadCSV(csv) {
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        a.download = 'respuesta_api.csv'; // Nombre del archivo CSV
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-    }
-
-    // Función para enviar la imagen a la API y descargar la respuesta como un archivo CSV
-    sendToAPIButton.addEventListener('click', function() {
-        // Obtener la imagen actual
-        const currentImage = document.querySelector("#imageDetailsTable tbody tr:last-child img");
-        
-        // Verificar si hay una imagen cargada
-        if (currentImage) {
-            // Crear un objeto FormData y agregar la imagen
-            const formData = new FormData();
-            formData.append('image', currentImage.src);
-
-            // Realizar la solicitud a la API
-            fetch('https://api.plantix.net/v2/image_analysis', {
-                method: 'POST',
-                body: formData,
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Generar el archivo CSV y descargarlo
-                const csv = generateCSV(data);
-                downloadCSV(csv);
-            })
-            .catch(error => console.error('Error:', error));
-        } else {
-            alert("No hay una imagen cargada para enviar a la API.");
-        }
-    });
-
-   // Función para generar el contenido del archivo CSV a partir de los datos de la respuesta de la API
-function generateCSV(data) {
-    // Crear una cadena de encabezado CSV
-    let csvData = 'Crop Health,Crops,Diagnoses,Diagnosis Likelihood,Scientific Name,Symptoms,Treatment (Chemical),Treatment (Organic)\n';
-
-    // Iterar a través de los diagnósticos predichos en la respuesta de la API
-    for (const diagnosis of data.predicted_diagnoses) {
-        const cropHealth = data.crop_health;
-        const crops = diagnosis.hosts.join(', '); // Convertir la matriz de cultivos en una cadena
-        const commonName = diagnosis.common_name;
-        const diagnosisLikelihood = diagnosis.diagnosis_likelihood;
-        const scientificName = diagnosis.scientific_name;
-        const symptoms = diagnosis.symptoms;
-        const treatmentChemical = diagnosis.treatment_chemical;
-        const treatmentOrganic = diagnosis.treatment_organic;
-
-        // Escapar las comas en los campos de texto
-        const escapedSymptoms = symptoms.replace(/,/g, ';');
-        const escapedTreatmentChemical = treatmentChemical.replace(/,/g, ';');
-        const escapedTreatmentOrganic = treatmentOrganic.replace(/,/g, ';');
-
-        // Agregar una fila al archivo CSV
-        csvData += `${cropHealth},${crops},${commonName},${diagnosisLikelihood},${scientificName},"${escapedSymptoms}","${escapedTreatmentChemical}","${escapedTreatmentOrganic}"\n`;
-    }
-
-    return csvData;
-}
-
-    // Función para descargar un archivo CSV
-    function downloadCSV(csv) {
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        a.download = 'respuesta_api.csv'; // Nombre del archivo CSV
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-    }
+    // Las funciones para generar y descargar el CSV podrían ir aquí si son necesarias
 });
