@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Página Web</title>
+    <title>Interacción con API - Plantix</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>¡Carga y Toma de Imágenes!</h1>
+    <h1>Carga / Toma de imágenes</h1>
 
     <!-- Para cargar imágenes -->
     <input type="file" id="imageLoader" name="imageLoader" accept="image/*"/>
 
-    <!-- Para activar y tomar imágenes con la cámara -->
+    <!-- Para activar cámara y tomar fotos -->
     <button id="cameraButton">Activar Cámara</button>
     <video id="video" style="display:none;"></video>
     <canvas id="canvas" style="display:none;"></canvas>
@@ -35,6 +35,9 @@
         <tbody>
         </tbody>
     </table>
+
+    <!-- Botón para enviar la imagen a la API y descargar respuesta como CSV -->
+    <button id="sendAndDownloadButton">Enviar</button>
 
     <script src="script.js"></script>
 </body>
