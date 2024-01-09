@@ -9,6 +9,13 @@
 <body>
     <h1>Módulo de Documentación</h1>
 
+    <!-- Formulario para nombre del usuario -->
+    <form id="user-form">
+        <label for="userName">Nombre:</label>
+        <input type="text" id="userName" name="userName">
+        <input type="submit" value="Submit">
+    </form>
+
     <!-- Para cargar imágenes -->
     <input type="file" id="imageLoader" name="imageLoader" accept="image/*"/>
 
@@ -29,10 +36,14 @@
                 <th>Fecha y Hora</th>
                 <th>Latitud</th>
                 <th>Longitud</th>
-                <th>Correlativo</th>
+                <th>Cultivo</th> <!-- Columna agregada para el menú desplegable de cultivos -->
+                <th>Eliminar</th>
+                <th>Respuesta API</th>
+                <th>Verdadero/Falso</th>
             </tr>
         </thead>
         <tbody>
+            <!-- Aquí se agregarán las filas dinámicamente con JavaScript -->
         </tbody>
     </table>
 
