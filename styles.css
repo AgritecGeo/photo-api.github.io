@@ -70,3 +70,61 @@ a {
 
 a:hover {
     color: #00563F; /* Color de enlace en verde oscuro al pasar el mouse */
+
+
+
+Very Last CSS:
+
+
+/* Estilo adicional para el formulario de ingreso de nombre */
+#user-form {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Estilo para el input y botones del formulario */
+#user-form input[type="text"], 
+#user-form input[type="submit"] {
+    padding: 8px;
+    margin-right: 10px;
+}
+
+/* Estilo para el contenedor de imágenes previsualizadas */
+#imagePreviewContainer {
+    text-align: center;
+    margin: 20px 0;
+}
+
+/* Estilo para las imágenes en el contenedor de previsualización */
+#imagePreviewContainer img {
+    max-width: 100px;
+    margin: 5px;
+    border: 1px solid #ddd;
+    padding: 5px;
+    background-color: #fff;
+}
+
+/* Estilo para los elementos select (menú desplegable de cultivos) en la tabla */
+table#imageDetailsTable select {
+    padding: 5px;
+    margin: 5px 0;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+}
+
+/* Estilo para los botones Verdadero/Falso */
+table#imageDetailsTable button {
+    padding: 5px 10px;
+    margin-right: 5px;
+    font-size: 0.8em;
+    color: #fff;
+    background-color: #007D60;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+table#imageDetailsTable button:hover {
+    background-color: #00563F;
+}
