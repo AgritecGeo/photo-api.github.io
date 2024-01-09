@@ -110,11 +110,11 @@ document.addEventListener("DOMContentLoaded", function() {
         trueFalseCell.appendChild(falseButton);
     }
 
-    // Función para enviar la imagen a la API y descargar la respuesta como un archivo CSV
+    // Función para enviar la imagen a la API y manejar la respuesta
     sendToAPIButton.addEventListener('click', function() {
         // Obtener la imagen actual
         const currentImage = document.querySelector("#imageDetailsTable tbody tr:last-child img");
-        
+
         // Verificar si hay una imagen cargada
         if (currentImage) {
             // Crear un objeto FormData y agregar la imagen
@@ -122,14 +122,17 @@ document.addEventListener("DOMContentLoaded", function() {
             formData.append('image', currentImage.src);
 
             // Realizar la solicitud a la API
-            fetch('https://api.example.com/image_analysis', {
+            fetch('https://api.plantix.net/v2/image_analysis', {
                 method: 'POST',
+                headers: {
+                    'Authorization': '2b0080cfd58f564046a1104db36c9163091c2a07'
+                },
                 body: formData,
             })
             .then(response => response.json())
             .then(data => {
-                // Aquí puedes manejar la respuesta de la API y actualizar la tabla
-                // Por ejemplo, agregar la respuesta a la columna correspondiente
+                // Actualizar la tabla con la respuesta de la API
+                updateTableWithApiResponse(data);
             })
             .catch(error => console.error('Error:', error));
         } else {
@@ -137,5 +140,14 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // Las funciones para generar y descargar el CSV podrían ir aquí si son necesarias
+    function updateTableWithApiResponse(data) {
+        // Encuentra la última fila de la tabla
+        const lastRow = document.querySelector("#imageDetailsTable tbody tr:last-child");
+
+        // Actualizar la celda de la respuesta de la API
+        lastRow.cells[6].textContent = `Salud del cultivo: ${data.crop_health}`;
+
+        // Agregar un botón o enlace para mostrar más detalles si es necesario
+        // Por ejemplo, un botón que abre un modal con todos los detalles
+    }
 });
