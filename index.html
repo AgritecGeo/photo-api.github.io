@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Página Web</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>¡Carga y Toma de Imágenes!</h1>
+
+    <!-- Para cargar imágenes -->
+    <input type="file" id="imageLoader" name="imageLoader" accept="image/*"/>
+
+    <!-- Para activar y tomar imágenes con la cámara -->
+    <button id="cameraButton">Activar Cámara</button>
+    <video id="video" style="display:none;"></video>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <button id="takePhotoButton" style="display:none;">Tomar Foto</button>
+
+    <!-- Contenedor de imágenes previsualizadas -->
+    <div id="imagePreviewContainer"></div>
+
+    <!-- Tabla para mostrar detalles de las imágenes -->
+    <table id="imageDetailsTable">
+        <thead>
+            <tr>
+                <th>Miniatura</th>
+                <th>Fecha y Hora</th>
+                <th>Latitud</th>
+                <th>Longitud</th>
+                <th>Correlativo</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script src="script.js"></script>
+</body>
+</html>
