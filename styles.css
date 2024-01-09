@@ -71,11 +71,6 @@ a {
 a:hover {
     color: #00563F; /* Color de enlace en verde oscuro al pasar el mouse */
 
-
-
-Very Last CSS:
-
-
 /* Estilo adicional para el formulario de ingreso de nombre */
 #user-form {
     text-align: center;
