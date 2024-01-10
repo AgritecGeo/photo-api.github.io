@@ -116,13 +116,13 @@ document.addEventListener("DOMContentLoaded", function() {
     function addToEvaluationTable(correlativo) {
         const evalTable = document.getElementById('evaluationTable').getElementsByTagName('tbody')[0];
         const diagnoses = [
-            { label: 'Enfermedad', value: 'Fusarium Wilt' },
-            { label: 'Nombre Científico', value: 'Fusarium oxysporum' },
+            { label: 'Enfermedad', value: 'Rust of coffee' },
+            { label: 'Nombre Científico', value: 'Hemileia vastatrix' },
             { label: 'Clase de Patógeno', value: 'fungi' },
-            { label: 'Diagnóstico', value: 'possible' },
-            { label: 'Tratamientos o Medidas Preventivas', value: 'Plant resistant varieties if available in your area.' },
-            { label: 'Tratamientos o Medidas Preventivas', value: 'Adjust soil pH to 6.5-7.0 and use nitrate as nitrogen source.' },
-            { label: 'Tratamientos o Medidas Preventivas', value: 'Monitor fields for signs of the disease.' }
+            { label: 'Diagnóstico', value: 'very_likely' },
+            { label: 'Tratamientos o Medidas Preventivas', value: 'Plant more than one coffee variety and avoid monocultures.' },
+            { label: 'Tratamientos o Medidas Preventivas', value: 'Practice wider spacing and appropriate pruning to prevent prolonged wetness and to increase penetration of fungicides sprayed into the tree canopy.' },
+            { label: 'Tratamientos o Medidas Preventivas', value: 'Use more plants and shrubs that act as natural barriers to the spread of the disease.' }
         ];
 
         diagnoses.forEach(diagnosis => {
