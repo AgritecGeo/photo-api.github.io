@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const context = canvas.getContext('2d');
     const cameraButton = document.getElementById('cameraButton');
     const takePhotoButton = document.getElementById('takePhotoButton');
-    const sendToAPIButton = document.getElementById('sendAndDownloadButton'); // Botón para enviar la imagen a la API y descargar CSV
+    const sendToAPIButton = document.getElementById('sendAndDownloadButton'); 
 
     // Activar cámara
     cameraButton.addEventListener('click', function() {
@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // Función para agregar imágenes al contenedor de previsualización y a la tabla
+    // Función para agregar imágenes a la tabla
     function addImageToPreview(src) {
         imageCount++;
         const datetime = new Date().toLocaleString();
@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", function() {
         newRow.insertCell(1).textContent = datetime;
         newRow.insertCell(2).textContent = latitude;
         newRow.insertCell(3).textContent = longitude;
-        newRow.insertCell(4).textContent = `Foto ${count}`;
+        newRow.insertCell(4).textContent = `Foto_${count}_${datetime.replaceAll(' ', '_').replaceAll(':', '').replaceAll('/', '')}`;
 
         // Columna de selección de cultivo
         const cropSelectCell = newRow.insertCell(5);
@@ -98,28 +98,21 @@ document.addEventListener("DOMContentLoaded", function() {
             cropSelect.appendChild(option);
         });
         cropSelectCell.appendChild(cropSelect);
-
-        // Columnas para respuesta de la API y opciones Verdadero/Falso
-        newRow.insertCell(6); // Respuesta de la API
-        const trueFalseCell = newRow.insertCell(7);
-        const trueButton = document.createElement('button');
-        trueButton.textContent = 'Verdadero';
-        const falseButton = document.createElement('button');
-        falseButton.textContent = 'Falso';
-        trueFalseCell.appendChild(trueButton);
-        trueFalseCell.appendChild(falseButton);
     }
 
     // Función para enviar la imagen a la API y manejar la respuesta
     sendToAPIButton.addEventListener('click', function() {
         // Obtener la imagen actual
         const currentImage = document.querySelector("#imageDetailsTable tbody tr:last-child img");
+        const currentRow = document.querySelector("#imageDetailsTable tbody tr:last-child");
+        const cropSelected = currentRow.cells[5].querySelector('select').value;
 
         // Verificar si hay una imagen cargada
-        if (currentImage) {
+        if (currentImage && cropSelected) {
             // Crear un objeto FormData y agregar la imagen
             const formData = new FormData();
             formData.append('image', currentImage.src);
+            formData.append('crop', cropSelected);
 
             // Realizar la solicitud a la API
             fetch('https://api.plantix.net/v2/image_analysis', {
@@ -129,25 +122,55 @@ document.addEventListener("DOMContentLoaded", function() {
                 },
                 body: formData,
             })
-            .then(response => response.json())
-            .then(data => {
-                // Actualizar la tabla con la respuesta de la API
-                updateTableWithApiResponse(data);
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
             })
-            .catch(error => console.error('Error:', error));
+            .then(data => {
+                // Agregar respuesta de la API a la segunda tabla
+                addToEvaluationTable(currentRow.cells[4].textContent, data);
+                displayStatusMessage("Conexión Establecida Exitosamente");
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                displayStatusMessage('Error: ' + error.message);
+            });
         } else {
-            alert("No hay una imagen cargada para enviar a la API.");
+            displayStatusMessage("No hay una imagen cargada o no se seleccionó un cultivo.");
         }
     });
 
-    function updateTableWithApiResponse(data) {
-        // Encuentra la última fila de la tabla
-        const lastRow = document.querySelector("#imageDetailsTable tbody tr:last-child");
+    function addToEvaluationTable(correlativo, apiData) {
+        const evalTable = document.getElementById('evaluationTable').getElementsByTagName('tbody')[0];
+        const newRow = evalTable.insertRow();
 
-        // Actualizar la celda de la respuesta de la API
-        lastRow.cells[6].textContent = `Salud del cultivo: ${data.crop_health}`;
+        newRow.insertCell(0).textContent = correlativo;
+        newRow.insertCell(1).textContent = JSON.stringify(apiData); // Aquí puedes formatear la respuesta de la API como desees
 
-        // Agregar un botón o enlace para mostrar más detalles si es necesario
-        // Por ejemplo, un botón que abre un modal con todos los detalles
+        // Menú desplegable para Verdadero/Falso
+        const vfSelectCell = newRow.insertCell(2);
+        const vfSelect = document.createElement('select');
+        ["Verdadero", "Falso"].forEach(optionText => {
+            const option = document.createElement('option');
+            option.value = optionText;
+            option.textContent = optionText;
+            vfSelect.appendChild(option);
+        });
+        vfSelectCell.appendChild(vfSelect);
+    }
+
+    function displayStatusMessage(message) {
+        const statusContainer = document.getElementById('statusContainer');
+        if (!statusContainer) {
+            const newStatusContainer = document.createElement('div');
+            newStatusContainer.id = 'statusContainer';
+            newStatusContainer.style.color = 'blue';
+            newStatusContainer.textContent = message;
+            document.body.appendChild(newStatusContainer);
+        } else {
+            statusContainer.textContent = message;
+        }
     }
 });
