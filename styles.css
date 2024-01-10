@@ -4,9 +4,9 @@ body {
     margin: 0;
     padding: 0;
     background-image: url('https://filedn.com/lRAMUKU4tN3HUnQqI5npg4H/Plantix/Background/41ca9243-be8f-4b53-9afa-1a7961363874.png');
-    background-size: cover; /* Ajusta la imagen de fondo para cubrir todo el cuerpo */
-    background-repeat: no-repeat; /* Evita la repetición de la imagen */
-    background-attachment: fixed; /* Fija la imagen de fondo para que no se desplace con el contenido */
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -19,6 +19,8 @@ body {
     background-color: white;
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px; /* Agrega bordes redondeados al contenedor */
+    margin: 20px; /* Añade un margen alrededor del contenedor */
 }
 
 /* Estilo para tablas */
@@ -48,9 +50,30 @@ button, select {
     padding: 10px;
     margin: 10px;
     cursor: pointer;
+    border: none;
+    border-radius: 5px; /* Agrega bordes redondeados a los botones y selectores */
 }
 
 button:hover {
     background-color: #00563F;
     color: white;
+    transition: background-color 0.3s; /* Suaviza el cambio de color al pasar el mouse */
+}
+
+/* Estilo para el video y el canvas */
+#video, #canvas {
+    max-width: 100%;
+    border: 1px solid #ddd; /* Agrega un borde al video y al canvas */
+}
+
+/* Estilo para el contenedor de mensajes de estado */
+#statusContainer {
+    color: #007D60;
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+/* Estilo para el menú desplegable y el botón de carga de imagen */
+#userDropdown, #imageLoader {
+    margin-bottom: 20px;
 }
