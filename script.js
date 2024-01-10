@@ -2,7 +2,13 @@ document.addEventListener("DOMContentLoaded", function() {
     let imageCount = 0; // Contador para el correlativo de imágenes
 
     // Lista de cultivos
-    const cropsList = ["apple", "banana", "bean", "carrot", "cabbage", "cauliflower", "citrus", "coffee", "cucumber", "eggplant", "corn", "mango", "melon", "pepper", "peach", "papaya", "onion", "potato", "rice", "sorghum", "soy", "strawberries", "cane", "sweet potato", "tomato", "wheat", "zucchini"];
+    const cropsList = [
+        "apple", "banana", "bean", "carrot", "cabbage", "cauliflower",
+        "citrus", "coffee", "cucumber", "eggplant", "corn", "mango",
+        "melon", "pepper", "peach", "papaya", "onion", "potato",
+        "rice", "sorghum", "soy", "strawberries", "cane", "sweet potato",
+        "tomato", "wheat", "zucchini"
+    ];
 
     // Manejar carga de imagen
     document.getElementById('imageLoader').addEventListener('change', function(e) {
@@ -86,7 +92,8 @@ document.addEventListener("DOMContentLoaded", function() {
         newRow.insertCell(1).textContent = datetime;
         newRow.insertCell(2).textContent = latitude;
         newRow.insertCell(3).textContent = longitude;
-        newRow.insertCell(4).textContent = `Foto_${count}_${datetime.replaceAll(' ', '_').replaceAll(':', '').replaceAll('/', '')}`;
+        const correlativo = `Foto_${count}_${datetime.replaceAll(' ', '_').replaceAll(':', '').replaceAll('/', '')}`;
+        newRow.insertCell(4).textContent = correlativo;
 
         // Columna de selección de cultivo
         const cropSelectCell = newRow.insertCell(5);
@@ -100,54 +107,43 @@ document.addEventListener("DOMContentLoaded", function() {
         cropSelectCell.appendChild(cropSelect);
     }
 
+    // Función para cargar y analizar el archivo CSV
+    function loadCSV(url) {
+        return fetch(url)
+            .then(response => response.text())
+            .then(csvText => Papa.parse(csvText, { header: true }).data);
+    }
+
     // Función para enviar la imagen a la API y manejar la respuesta
     sendToAPIButton.addEventListener('click', function() {
-        const currentImage = document.querySelector("#imageDetailsTable tbody tr:last-child img");
-        const currentRow = document.querySelector("#imageDetailsTable tbody tr:last-child");
-        const cropSelected = currentRow.cells[5].querySelector('select').value;
-
-        if (currentImage && cropSelected) {
-            fetch(currentImage.src)
-                .then(res => res.blob())
-                .then(blob => {
-                    const formData = new FormData();
-                    formData.append('image', blob, 'image.png');
-                    formData.append('crop', cropSelected);
-
-                    fetch('https://api.plantix.net/v2/image_analysis', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': '2b0080cfd58f564046a1104db36c9163091c2a07'
-                        },
-                        body: formData
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        addToEvaluationTable(currentRow.cells[4].textContent, data);
-                        displayStatusMessage("Conexión Establecida Exitosamente");
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        displayStatusMessage('Error: ' + error.message);
-                    });
+        // Cargar el archivo CSV
+        loadCSV('https://filedn.com/lRAMUKU4tN3HUnQqI5npg4H/Plantix/diagnosticos_plantix.csv')
+            .then(data => {
+                // Suponemos que data es un array de objetos donde cada objeto representa una fila del CSV
+                const imageDetailsRows = document.querySelectorAll("#imageDetailsTable tbody tr");
+                imageDetailsRows.forEach((row, index) => {
+                    const correlativo = row.cells[4].textContent;
+                    const diagnosisInfo = data.find(diag => diag.Correlativo === correlativo);
+                    if (diagnosisInfo) {
+                        addToEvaluationTable(correlativo, diagnosisInfo['Diagnóstico']);
+                    }
                 });
-        } else {
-            displayStatusMessage("No hay una imagen cargada o no se seleccionó un cultivo.");
-        }
+            })
+            .catch(error => {
+                console.error('Error al cargar el archivo CSV:', error);
+                displayStatusMessage('Error al cargar el archivo CSV: ' + error.message);
+            });
     });
 
-    function addToEvaluationTable(correlativo, apiData) {
+    // Función para agregar la respuesta de la API a la segunda tabla
+    function addToEvaluationTable(correlativo, diagnosis) {
         const evalTable = document.getElementById('evaluationTable').getElementsByTagName('tbody')[0];
         const newRow = evalTable.insertRow();
 
         newRow.insertCell(0).textContent = correlativo;
-        newRow.insertCell(1).textContent = JSON.stringify(apiData);
+        newRow.insertCell(1).textContent = diagnosis; // Aquí agregas la información del CSV
 
+        // Menú desplegable para Verdadero/Falso
         const vfSelectCell = newRow.insertCell(2);
         const vfSelect = document.createElement('select');
         ["Verdadero", "Falso"].forEach(optionText => {
@@ -171,16 +167,4 @@ document.addEventListener("DOMContentLoaded", function() {
             statusContainer.textContent = message;
         }
     }
-
-    // ... (Cualquier otra lógica o funciones adicionales)
-
-    // Ejemplo: Función para resetear la interfaz
-    function resetInterface() {
-        // Código para resetear elementos de la interfaz, si es necesario
-    }
-
-    // Ejemplo: Agregar eventos adicionales o lógica
-    // document.getElementById('someElement').addEventListener('click', someFunction);
-
-    // ... (resto del código)
 });
