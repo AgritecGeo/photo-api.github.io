@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const context = canvas.getContext('2d');
     const cameraButton = document.getElementById('cameraButton');
     const takePhotoButton = document.getElementById('takePhotoButton');
-    const sendToAPIButton = document.getElementById('sendAndDownloadButton'); 
+    const sendToAPIButton = document.getElementById('sendAndDownloadButton');
 
     // Activar cámara
     cameraButton.addEventListener('click', function() {
@@ -49,11 +49,7 @@ document.addEventListener("DOMContentLoaded", function() {
         reader.onload = function(event) {
             callback(event.target.result);
         }
-        if (e.target.files[0] instanceof Blob) {
-            reader.readAsDataURL(e.target.files[0]);
-        } else {
-            callback(e.target.files[0]);
-        }
+        reader.readAsDataURL(e.target.files[0]);
     }
 
     // Función para agregar imágenes a la tabla
@@ -92,8 +88,7 @@ document.addEventListener("DOMContentLoaded", function() {
         newRow.insertCell(1).textContent = datetime;
         newRow.insertCell(2).textContent = latitude;
         newRow.insertCell(3).textContent = longitude;
-        const correlativo = `Foto_${count}_${datetime.replaceAll(' ', '_').replaceAll(':', '').replaceAll('/', '')}`;
-        newRow.insertCell(4).textContent = correlativo;
+        newRow.insertCell(4).textContent = `Foto_${count}_${datetime.replaceAll(' ', '_').replaceAll(':', '').replaceAll('/', '')}`;
 
         // Columna de selección de cultivo
         const cropSelectCell = newRow.insertCell(5);
@@ -107,64 +102,42 @@ document.addEventListener("DOMContentLoaded", function() {
         cropSelectCell.appendChild(cropSelect);
     }
 
-    // Función para cargar y analizar el archivo CSV
-    function loadCSV(url) {
-        return fetch(url)
-            .then(response => response.text())
-            .then(csvText => Papa.parse(csvText, { header: true }).data);
-    }
-
-    // Función para enviar la imagen a la API y manejar la respuesta
+    // Manejador de eventos para el botón de enviar
     sendToAPIButton.addEventListener('click', function() {
-        // Cargar el archivo CSV
-        loadCSV('https://filedn.com/lRAMUKU4tN3HUnQqI5npg4H/Plantix/diagnosticos_plantix.csv')
-            .then(data => {
-                // Suponemos que data es un array de objetos donde cada objeto representa una fila del CSV
-                const imageDetailsRows = document.querySelectorAll("#imageDetailsTable tbody tr");
-                imageDetailsRows.forEach((row, index) => {
-                    const correlativo = row.cells[4].textContent;
-                    const diagnosisInfo = data.find(diag => diag.Correlativo === correlativo);
-                    if (diagnosisInfo) {
-                        addToEvaluationTable(correlativo, diagnosisInfo['Diagnóstico']);
-                    }
-                });
-            })
-            .catch(error => {
-                console.error('Error al cargar el archivo CSV:', error);
-                displayStatusMessage('Error al cargar el archivo CSV: ' + error.message);
-            });
+        // Obtener el correlativo de la última imagen cargada
+        const lastImageRow = document.querySelector("#imageDetailsTable tbody tr:last-child");
+        if (lastImageRow) {
+            const correlativo = lastImageRow.cells[4].textContent;
+            addToEvaluationTable(correlativo);
+        }
     });
 
-    // Función para agregar la respuesta de la API a la segunda tabla
-    function addToEvaluationTable(correlativo, diagnosis) {
+    // Función para agregar detalles a la tabla de evaluación
+    function addToEvaluationTable(correlativo) {
         const evalTable = document.getElementById('evaluationTable').getElementsByTagName('tbody')[0];
-        const newRow = evalTable.insertRow();
+        const diagnoses = [
+            { label: 'Enfermedad', value: 'Fusarium Wilt' },
+            { label: 'Nombre Científico', value: 'Fusarium oxysporum' },
+            { label: 'Clase de Patógeno', value: 'fungi' },
+            { label: 'Diagnóstico', value: 'possible' },
+            { label: 'Tratamientos o Medidas Preventivas', value: 'Plant resistant varieties if available in your area.' },
+            { label: 'Tratamientos o Medidas Preventivas', value: 'Adjust soil pH to 6.5-7.0 and use nitrate as nitrogen source.' },
+            { label: 'Tratamientos o Medidas Preventivas', value: 'Monitor fields for signs of the disease.' }
+        ];
 
-        newRow.insertCell(0).textContent = correlativo;
-        newRow.insertCell(1).textContent = diagnosis; // Aquí agregas la información del CSV
-
-        // Menú desplegable para Verdadero/Falso
-        const vfSelectCell = newRow.insertCell(2);
-        const vfSelect = document.createElement('select');
-        ["Verdadero", "Falso"].forEach(optionText => {
-            const option = document.createElement('option');
-            option.value = optionText;
-            option.textContent = optionText;
-            vfSelect.appendChild(option);
+        diagnoses.forEach(diagnosis => {
+            const newRow = evalTable.insertRow();
+            newRow.insertCell(0).textContent = correlativo;
+            newRow.insertCell(1).textContent = `${diagnosis.label}: ${diagnosis.value}`;
+            const vfSelectCell = newRow.insertCell(2);
+            const vfSelect = document.createElement('select');
+            ["Verdadero", "Falso"].forEach(optionText => {
+                const option = document.createElement('option');
+                option.value = optionText;
+                option.textContent = optionText;
+                vfSelect.appendChild(option);
+            });
+            vfSelectCell.appendChild(vfSelect);
         });
-        vfSelectCell.appendChild(vfSelect);
-    }
-
-    function displayStatusMessage(message) {
-        const statusContainer = document.getElementById('statusContainer');
-        if (!statusContainer) {
-            const newStatusContainer = document.createElement('div');
-            newStatusContainer.id = 'statusContainer';
-            newStatusContainer.style.color = 'blue';
-            newStatusContainer.textContent = message;
-            document.body.appendChild(newStatusContainer);
-        } else {
-            statusContainer.textContent = message;
-        }
     }
 });
