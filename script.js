@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     fetch('https://api.plantix.net/v2/image_analysis', {
                         method: 'POST',
                         headers: {
-                            'Authorization': 'Bearer 2b0080cfd58f564046a1104db36c9163091c2a07'
+                            'Authorization': '2b0080cfd58f564046a1104db36c9163091c2a07'
                         },
                         body: formData
                     })
