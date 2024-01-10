@@ -102,41 +102,40 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Función para enviar la imagen a la API y manejar la respuesta
     sendToAPIButton.addEventListener('click', function() {
-        // Obtener la imagen actual
         const currentImage = document.querySelector("#imageDetailsTable tbody tr:last-child img");
         const currentRow = document.querySelector("#imageDetailsTable tbody tr:last-child");
         const cropSelected = currentRow.cells[5].querySelector('select').value;
 
-        // Verificar si hay una imagen cargada
         if (currentImage && cropSelected) {
-            // Crear un objeto FormData y agregar la imagen
-            const formData = new FormData();
-            formData.append('image', currentImage.src);
-            formData.append('crop', cropSelected);
+            fetch(currentImage.src)
+                .then(res => res.blob())
+                .then(blob => {
+                    const formData = new FormData();
+                    formData.append('image', blob, 'image.png');
+                    formData.append('crop', cropSelected);
 
-            // Realizar la solicitud a la API
-            fetch('https://api.plantix.net/v2/image_analysis', {
-                method: 'POST',
-                headers: {
-                    'Authorization': '2b0080cfd58f564046a1104db36c9163091c2a07'
-                },
-                body: formData,
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Agregar respuesta de la API a la segunda tabla
-                addToEvaluationTable(currentRow.cells[4].textContent, data);
-                displayStatusMessage("Conexión Establecida Exitosamente");
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                displayStatusMessage('Error: ' + error.message);
-            });
+                    fetch('https://api.plantix.net/v2/image_analysis', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer 2b0080cfd58f564046a1104db36c9163091c2a07'
+                        },
+                        body: formData
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        addToEvaluationTable(currentRow.cells[4].textContent, data);
+                        displayStatusMessage("Conexión Establecida Exitosamente");
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        displayStatusMessage('Error: ' + error.message);
+                    });
+                });
         } else {
             displayStatusMessage("No hay una imagen cargada o no se seleccionó un cultivo.");
         }
@@ -147,9 +146,8 @@ document.addEventListener("DOMContentLoaded", function() {
         const newRow = evalTable.insertRow();
 
         newRow.insertCell(0).textContent = correlativo;
-        newRow.insertCell(1).textContent = JSON.stringify(apiData); // Aquí puedes formatear la respuesta de la API como desees
+        newRow.insertCell(1).textContent = JSON.stringify(apiData);
 
-        // Menú desplegable para Verdadero/Falso
         const vfSelectCell = newRow.insertCell(2);
         const vfSelect = document.createElement('select');
         ["Verdadero", "Falso"].forEach(optionText => {
@@ -173,4 +171,16 @@ document.addEventListener("DOMContentLoaded", function() {
             statusContainer.textContent = message;
         }
     }
+
+    // ... (Cualquier otra lógica o funciones adicionales)
+
+    // Ejemplo: Función para resetear la interfaz
+    function resetInterface() {
+        // Código para resetear elementos de la interfaz, si es necesario
+    }
+
+    // Ejemplo: Agregar eventos adicionales o lógica
+    // document.getElementById('someElement').addEventListener('click', someFunction);
+
+    // ... (resto del código)
 });
