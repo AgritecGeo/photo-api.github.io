@@ -7,47 +7,62 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Módulo de Documentación</h1>
+    <div class="centered-container">
+        <h1>Módulo de Documentación</h1>
 
-    <!-- Formulario para nombre del usuario -->
-    <form id="user-form">
-        <label for="userName">Nombre:</label>
-        <input type="text" id="userName" name="userName">
-        <input type="submit" value="Submit">
-    </form>
+        <!-- Menú desplegable para seleccionar el usuario -->
+        <select id="userDropdown">
+            <option value="Usuario 1">Usuario 1</option>
+            <option value="Usuario 2">Usuario 2</option>
+            <!-- ... hasta Usuario 10 -->
+            <option value="Usuario 10">Usuario 10</option>
+        </select>
 
-    <!-- Para cargar imágenes -->
-    <input type="file" id="imageLoader" name="imageLoader" accept="image/*"/>
+        <!-- Para cargar imágenes -->
+        <input type="file" id="imageLoader" name="imageLoader" accept="image/*"/>
 
-    <!-- Para activar cámara y tomar fotos -->
-    <button id="cameraButton">Activar Cámara</button>
-    <video id="video" style="display:none;"></video>
-    <canvas id="canvas" style="display:none;"></canvas>
-    <button id="takePhotoButton" style="display:none;">Tomar Foto</button>
+        <!-- Para activar cámara y tomar fotos -->
+        <button id="cameraButton">Activar Cámara</button>
+        <video id="video" style="display:none;"></video>
+        <canvas id="canvas" style="display:none;"></canvas>
+        <button id="takePhotoButton" style="display:none;">Tomar Foto</button>
 
-    <!-- Contenedor de imágenes previsualizadas -->
-    <div id="imagePreviewContainer"></div>
+        <!-- Tabla para mostrar detalles de las imágenes -->
+        <table id="imageDetailsTable">
+            <thead>
+                <tr>
+                    <th>Miniatura</th>
+                    <th>Fecha y Hora</th>
+                    <th>Latitud</th>
+                    <th>Longitud</th>
+                    <th>Cultivo</th>
+                    <th>Correlativo</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
 
-    <!-- Tabla para mostrar detalles de las imágenes -->
-    <table id="imageDetailsTable">
-        <thead>
-            <tr>
-                <th>Miniatura</th>
-                <th>Fecha y Hora</th>
-                <th>Latitud</th>
-                <th>Longitud</th>
-                <th>Cultivo</th>
-                <th>Eliminar</th>
-                <th>Respuesta API</th>
-                <th>Verdadero/Falso</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+        <!-- Botón para enviar la imagen a la API -->
+        <button id="sendAndDownloadButton">Enviar</button>
 
-    <!-- Botón para enviar la imagen a la API y descargar respuesta como CSV -->
-    <button id="sendAndDownloadButton">Enviar</button>
+        <h2>Módulo de Evaluación</h2>
+        <!-- Tabla para la evaluación -->
+        <table id="evaluationTable">
+            <thead>
+                <tr>
+                    <th>Correlativo</th>
+                    <th>Respuesta API</th>
+                    <th>Verdadero/Falso</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+
+        <!-- Botón para guardar la evaluación -->
+        <button id="saveEvaluationButton">Guardar Evaluación</button>
+    </div>
 
     <script src="script.js"></script>
 </body>
