@@ -2,13 +2,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let imageCount = 0; // Contador para el correlativo de imágenes
 
     // Lista de cultivos
-    const cropsList = [
-        "apple", "banana", "bean", "carrot", "cabbage", "cauliflower",
-        "citrus", "coffee", "cucumber", "eggplant", "corn", "mango",
-        "melon", "pepper", "peach", "papaya", "onion", "potato",
-        "rice", "sorghum", "soy", "strawberries", "cane", "sweet potato",
-        "tomato", "wheat", "zucchini"
-    ];
+    const cropsList = ["apple", "banana", "bean", "carrot", "cabbage", "cauliflower", "citrus", "coffee", "cucumber", "eggplant", "corn", "mango", "melon", "pepper", "peach", "papaya", "onion", "potato", "rice", "sorghum", "soy", "strawberries", "cane", "sweet potato", "tomato", "wheat", "zucchini"];
 
     // Manejar carga de imagen
     document.getElementById('imageLoader').addEventListener('change', function(e) {
@@ -21,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const context = canvas.getContext('2d');
     const cameraButton = document.getElementById('cameraButton');
     const takePhotoButton = document.getElementById('takePhotoButton');
-    const sendToAPIButton = document.getElementById('sendAndDownloadButton');
+    const sendToAPIButton = document.getElementById('sendAndDownloadButton'); 
 
     // Activar cámara
     cameraButton.addEventListener('click', function() {
@@ -49,7 +43,11 @@ document.addEventListener("DOMContentLoaded", function() {
         reader.onload = function(event) {
             callback(event.target.result);
         }
-        reader.readAsDataURL(e.target.files[0]);
+        if (e.target.files[0] instanceof Blob) {
+            reader.readAsDataURL(e.target.files[0]);
+        } else {
+            callback(e.target.files[0]);
+        }
     }
 
     // Función para agregar imágenes a la tabla
@@ -102,42 +100,77 @@ document.addEventListener("DOMContentLoaded", function() {
         cropSelectCell.appendChild(cropSelect);
     }
 
-    // Manejador de eventos para el botón de enviar
+    // Función para enviar la imagen a la API y manejar la respuesta
     sendToAPIButton.addEventListener('click', function() {
-        // Obtener el correlativo de la última imagen cargada
-        const lastImageRow = document.querySelector("#imageDetailsTable tbody tr:last-child");
-        if (lastImageRow) {
-            const correlativo = lastImageRow.cells[4].textContent;
-            addToEvaluationTable(correlativo);
+        // Obtener la imagen actual
+        const currentImage = document.querySelector("#imageDetailsTable tbody tr:last-child img");
+        const currentRow = document.querySelector("#imageDetailsTable tbody tr:last-child");
+        const cropSelected = currentRow.cells[5].querySelector('select').value;
+
+        // Verificar si hay una imagen cargada
+        if (currentImage && cropSelected) {
+            // Crear un objeto FormData y agregar la imagen
+            const formData = new FormData();
+            formData.append('image', currentImage.src);
+            formData.append('crop', cropSelected);
+
+            // Realizar la solicitud a la API
+            fetch('https://api.plantix.net/v2/image_analysis', {
+                method: 'POST',
+                headers: {
+                    'Authorization': '2b0080cfd58f564046a1104db36c9163091c2a07'
+                },
+                body: formData,
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Agregar respuesta de la API a la segunda tabla
+                addToEvaluationTable(currentRow.cells[4].textContent, data);
+                displayStatusMessage("Conexión Establecida Exitosamente");
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                displayStatusMessage('Error: ' + error.message);
+            });
+        } else {
+            displayStatusMessage("No hay una imagen cargada o no se seleccionó un cultivo.");
         }
     });
 
-    // Función para agregar detalles a la tabla de evaluación
-    function addToEvaluationTable(correlativo) {
+    function addToEvaluationTable(correlativo, apiData) {
         const evalTable = document.getElementById('evaluationTable').getElementsByTagName('tbody')[0];
-        const diagnoses = [
-            { label: 'Enfermedad', value: 'Rust of coffee' },
-            { label: 'Nombre Científico', value: 'Hemileia vastatrix' },
-            { label: 'Clase de Patógeno', value: 'fungi' },
-            { label: 'Diagnóstico', value: 'very_likely' },
-            { label: 'Tratamientos o Medidas Preventivas', value: 'Plant more than one coffee variety and avoid monocultures.' },
-            { label: 'Tratamientos o Medidas Preventivas', value: 'Practice wider spacing and appropriate pruning to prevent prolonged wetness and to increase penetration of fungicides sprayed into the tree canopy.' },
-            { label: 'Tratamientos o Medidas Preventivas', value: 'Use more plants and shrubs that act as natural barriers to the spread of the disease.' }
-        ];
+        const newRow = evalTable.insertRow();
 
-        diagnoses.forEach(diagnosis => {
-            const newRow = evalTable.insertRow();
-            newRow.insertCell(0).textContent = correlativo;
-            newRow.insertCell(1).textContent = `${diagnosis.label}: ${diagnosis.value}`;
-            const vfSelectCell = newRow.insertCell(2);
-            const vfSelect = document.createElement('select');
-            ["Verdadero", "Falso"].forEach(optionText => {
-                const option = document.createElement('option');
-                option.value = optionText;
-                option.textContent = optionText;
-                vfSelect.appendChild(option);
-            });
-            vfSelectCell.appendChild(vfSelect);
+        newRow.insertCell(0).textContent = correlativo;
+        newRow.insertCell(1).textContent = JSON.stringify(apiData); // Aquí puedes formatear la respuesta de la API como desees
+
+        // Menú desplegable para Verdadero/Falso
+        const vfSelectCell = newRow.insertCell(2);
+        const vfSelect = document.createElement('select');
+        ["Verdadero", "Falso"].forEach(optionText => {
+            const option = document.createElement('option');
+            option.value = optionText;
+            option.textContent = optionText;
+            vfSelect.appendChild(option);
         });
+        vfSelectCell.appendChild(vfSelect);
+    }
+
+    function displayStatusMessage(message) {
+        const statusContainer = document.getElementById('statusContainer');
+        if (!statusContainer) {
+            const newStatusContainer = document.createElement('div');
+            newStatusContainer.id = 'statusContainer';
+            newStatusContainer.style.color = 'blue';
+            newStatusContainer.textContent = message;
+            document.body.appendChild(newStatusContainer);
+        } else {
+            statusContainer.textContent = message;
+        }
     }
 });
