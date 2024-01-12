@@ -1,8 +1,8 @@
 document.addEventListener("DOMContentLoaded", function() {
     let imageCount = 0; // Contador para el correlativo de imágenes
 
-    // Lista de cultivos
-    const cropsList = ["apple", "banana", "bean", "carrot", "cabbage", "cauliflower", "citrus", "coffee", "cucumber", "eggplant", "corn", "mango", "melon", "pepper", "peach", "papaya", "onion", "potato", "rice", "sorghum", "soy", "strawberries", "cane", "sweet potato", "tomato", "wheat", "zucchini"];
+    // Lista de cultivos en español (solo hortalizas, papa y café)
+    const cropsList = ["Hortaliza", "Papa", "Café"];
 
     // Manejar carga de imagen
     document.getElementById('imageLoader').addEventListener('change', function(e) {
@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const context = canvas.getContext('2d');
     const cameraButton = document.getElementById('cameraButton');
     const takePhotoButton = document.getElementById('takePhotoButton');
+    const removePhotoButton = document.getElementById('removePhotoButton');
     const sendToAPIButton = document.getElementById('sendAndDownloadButton'); 
 
     // Activar cámara
@@ -25,6 +26,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 video.play();
                 video.style.display = 'block';
                 takePhotoButton.style.display = 'block';
+                removePhotoButton.style.display = 'none';
             });
         }
     });
@@ -35,6 +37,14 @@ document.addEventListener("DOMContentLoaded", function() {
         canvas.height = video.videoHeight;
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
         handleImage({target: {files: [canvas.toDataURL('image/png')]}}, addImageToPreview);
+        removePhotoButton.style.display = 'block';
+    });
+
+    // Eliminar foto
+    removePhotoButton.addEventListener('click', function() {
+        document.getElementById('imagePreview').innerHTML = '';
+        removePhotoButton.style.display = 'none';
+        imageCount--;
     });
 
     // Función para manejar imágenes y agregar previsualización
@@ -52,6 +62,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Función para agregar imágenes a la tabla
     function addImageToPreview(src) {
+        if (document.getElementById('imagePreview').innerHTML != '') {
+            return; // Evitar agregar más de una imagen
+        }
+
         imageCount++;
         const datetime = new Date().toLocaleString();
         let latitude = '';
@@ -130,6 +144,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     .then(data => {
                         addToEvaluationTable(currentRow.cells[4].textContent, data);
                         displayStatusMessage("Conexión Establecida Exitosamente");
+                        document.getElementById('observationsTextarea').readOnly = true;
                     })
                     .catch(error => {
                         console.error('Error:', error);
@@ -145,12 +160,15 @@ document.addEventListener("DOMContentLoaded", function() {
         const evalTable = document.getElementById('evaluationTable').getElementsByTagName('tbody')[0];
         const newRow = evalTable.insertRow();
 
-        newRow.insertCell(0).textContent = correlativo;
-        newRow.insertCell(1).textContent = JSON.stringify(apiData);
+        newRow.insertCell(0).textContent = /* Nombre Común */;
+        newRow.insertCell(1).textContent = /* Nombre Científico */;
+        newRow.insertCell(2).textContent = /* Patógeno */;
+        newRow.insertCell(3).textContent = /* Probabilidad */;
+        newRow.insertCell(4).textContent = /* Tratamiento o Recomendación */;
 
-        const vfSelectCell = newRow.insertCell(2);
+        const vfSelectCell = newRow.insertCell(5);
         const vfSelect = document.createElement('select');
-        ["Verdadero", "Falso"].forEach(optionText => {
+        ["Verdadero", "Falso", "No lo sé"].forEach(optionText => {
             const option = document.createElement('option');
             option.value = optionText;
             option.textContent = optionText;
@@ -171,6 +189,7 @@ document.addEventListener("DOMContentLoaded", function() {
             statusContainer.textContent = message;
         }
     }
+
     // ... (Cualquier otra lógica o funciones adicionales)
 
     // Ejemplo: Función para resetear la interfaz
