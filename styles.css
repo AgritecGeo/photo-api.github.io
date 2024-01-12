@@ -4,9 +4,9 @@ body {
     margin: 0;
     padding: 0;
     background-image: url('https://filedn.com/lRAMUKU4tN3HUnQqI5npg4H/Plantix/Background/41ca9243-be8f-4b53-9afa-1a7961363874.png');
-    background-size: cover; /* Ajusta la imagen de fondo para cubrir todo el cuerpo */
-    background-repeat: no-repeat; /* Evita la repetición de la imagen */
-    background-attachment: fixed; /* Fija la imagen de fondo para que no se desplace con el contenido */
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -53,4 +53,46 @@ button, select {
 button:hover {
     background-color: #00563F;
     color: white;
+}
+
+/* Estilo para la sección de carga de imágenes y toma de fotografía */
+.image-upload-section {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.custom-file-upload {
+    padding: 10px;
+    margin: 10px;
+    background-color: #007D60;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.image-preview {
+    margin-top: 10px;
+    max-width: 300px;
+    max-height: 300px;
+    border: 1px solid #ddd;
+}
+
+/* Estilo para casillas de texto */
+.text-inputs-section {
+    margin-top: 20px;
+}
+
+.text-inputs-section label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.text-inputs-section input,
+.text-inputs-section textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
 }
