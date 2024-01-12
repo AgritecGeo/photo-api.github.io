@@ -62,7 +62,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Función para agregar imágenes a la tabla
     function addImageToPreview(src) {
-        if (document.getElementById('imagePreview').innerHTML != '') {
+        const imagePreview = document.getElementById('imagePreview');
+        if (imagePreview.innerHTML != '') {
             return; // Evitar agregar más de una imagen
         }
 
@@ -82,6 +83,13 @@ document.addEventListener("DOMContentLoaded", function() {
         } else {
             addToTable(src, datetime, latitude, longitude, imageCount);
         }
+
+        // Mostrar miniatura
+        const thumbnail = new Image();
+        thumbnail.src = src;
+        thumbnail.style.width = '100px';
+        thumbnail.style.height = '100px';
+        imagePreview.appendChild(thumbnail);
     }
 
     // Función para agregar detalles a la tabla
