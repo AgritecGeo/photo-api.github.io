@@ -19,6 +19,7 @@ body {
     background-color: white;
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 960px;
 }
 
 /* Estilo para tablas */
@@ -95,4 +96,24 @@ button:hover {
     margin-bottom: 10px;
     border: 1px solid #ddd;
     border-radius: 5px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .centered-container {
+        width: 95%;
+        padding: 10px;
+    }
+
+    .image-preview {
+        max-width: 100%;
+        height: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    button, .custom-file-upload {
+        width: 100%;
+        margin: 10px 0;
+    }
 }
