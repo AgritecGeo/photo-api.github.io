@@ -171,33 +171,6 @@ document.addEventListener("DOMContentLoaded", function() {
             statusContainer.textContent = message;
         }
     }
-    document.getElementById('imageLoader').addEventListener('change', function(event) {
-        const imageFile = event.target.files[0];
-        if (!imageFile) {
-            console.log("No file selected.");
-            return;
-        }
-        const token = '2b0080cfd58f564046a1104db36c9163091c2a07';
-        const url = 'https://api.plantix.net/v2/image_analysis';
-        const formData = new FormData();
-        formData.append('image', imageFile);
-        formData.append('application_used_image_gallery', 'false');
-       
-        const headers = {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data', // Asegúrate de definir o tener el token
-        };
-   
-        // Reemplaza 'url' con la URL de la API a la que deseas enviar la solicitud
-        fetch(url, {
-            method: 'POST',
-            headers: headers,
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => console.log(data))
-        .catch(error => console.error('Error:', error));
-    });
     // ... (Cualquier otra lógica o funciones adicionales)
 
     // Ejemplo: Función para resetear la interfaz
