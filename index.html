@@ -10,28 +10,17 @@
     <div class="centered-container">
         <h1>Módulo de Documentación</h1>
 
-        <!-- Menú desplegable para seleccionar el usuario -->
-        <select id="userDropdown">
-            <option value="Usuario 1">Usuario 1</option>
-            <option value="Usuario 2">Usuario 2</option>
-            <option value="Usuario 3">Usuario 3</option>
-            <option value="Usuario 4">Usuario 4</option>
-            <option value="Usuario 5">Usuario 5</option>
-            <option value="Usuario 6">Usuario 6</option>
-            <option value="Usuario 7">Usuario 7</option>
-            <option value="Usuario 8">Usuario 8</option>
-            <option value="Usuario 9">Usuario 9</option>
-            <option value="Usuario 10">Usuario 10</option>
-        </select>
-
-        <!-- Para cargar imágenes -->
-        <input type="file" id="imageLoader" name="imageLoader" accept="image/*"/>
-
-        <!-- Para activar cámara y tomar fotos -->
-        <button id="cameraButton">Activar Cámara</button>
-        <video id="video" style="display:none;"></video>
-        <canvas id="canvas" style="display:none;"></canvas>
-        <button id="takePhotoButton" style="display:none;">Tomar Foto</button>
+        <!-- Sección de carga de imagen y toma de fotografía -->
+        <div class="image-upload-section">
+            <input type="file" id="imageLoader" name="imageLoader" accept="image/*" hidden/>
+            <label for="imageLoader" class="custom-file-upload">Subir Imagen</label>
+            <button id="cameraButton">Activar Cámara</button>
+            <video id="video" style="display:none;"></video>
+            <canvas id="canvas" style="display:none;"></canvas>
+            <button id="takePhotoButton" style="display:none;">Tomar Foto</button>
+            <button id="removePhotoButton" style="display:none;">Eliminar Foto</button>
+            <div id="imagePreview" class="image-preview"></div>
+        </div>
 
         <!-- Tabla para mostrar detalles de las imágenes -->
         <table id="imageDetailsTable">
@@ -49,22 +38,39 @@
             </tbody>
         </table>
 
+        <!-- Casillas de texto después de la tabla -->
+        <div class="text-inputs-section">
+            <label for="clientInput">Cliente:</label>
+            <input type="text" id="clientInput" name="clientInput">
+            <label for="observationsTextarea">Observaciones:</label>
+            <textarea id="observationsTextarea" name="observationsTextarea" rows="4"></textarea>
+        </div>
+
         <!-- Botón para enviar la imagen a la API -->
         <button id="sendAndDownloadButton">Enviar</button>
 
+        <!-- Módulo de Evaluación -->
         <h2>Módulo de Evaluación</h2>
-        <!-- Tabla para la evaluación -->
         <table id="evaluationTable">
             <thead>
                 <tr>
-                    <th>Correlativo</th>
-                    <th>Respuesta API</th>
-                    <th>Verdadero/Falso</th>
+                    <th>Nombre Común</th>
+                    <th>Nombre Científico</th>
+                    <th>Patógeno</th>
+                    <th>Probabilidad</th>
+                    <th>Tratamiento o Recomendación</th>
+                    <th>Evaluación</th>
                 </tr>
             </thead>
             <tbody>
             </tbody>
         </table>
+
+        <!-- Casilla de texto para observaciones en módulo de evaluación -->
+        <div class="text-inputs-section">
+            <label for="evaluationObservationsTextarea">Observaciones:</label>
+            <textarea id="evaluationObservationsTextarea" name="evaluationObservationsTextarea" rows="4"></textarea>
+        </div>
 
         <!-- Botón para guardar la evaluación -->
         <button id="saveEvaluationButton">Guardar Evaluación</button>
