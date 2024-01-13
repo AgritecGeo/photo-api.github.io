@@ -167,11 +167,11 @@ document.addEventListener("DOMContentLoaded", function() {
         const evalTable = document.getElementById('evaluationTable').getElementsByTagName('tbody')[0];
         const newRow = evalTable.insertRow();
 
-        newRow.insertCell(0).textContent = /* Nombre Común */;
-        newRow.insertCell(1).textContent = /* Nombre Científico */;
-        newRow.insertCell(2).textContent = /* Patógeno */;
-        newRow.insertCell(3).textContent = /* Probabilidad */;
-        newRow.insertCell(4).textContent = /* Tratamiento o Recomendación */;
+        newRow.insertCell(0).textContent = "Nombre Común";
+        newRow.insertCell(1).textContent = "Nombre Científico";
+        newRow.insertCell(2).textContent = "Patógeno";
+        newRow.insertCell(3).textContent = "Probabilidad";
+        newRow.insertCell(4).textContent = "Tratamiento o Recomendación";
 
         const vfSelectCell = newRow.insertCell(5);
         const vfSelect = document.createElement('select');
