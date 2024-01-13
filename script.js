@@ -91,110 +91,109 @@ document.addEventListener("DOMContentLoaded", function() {
         thumbnail.style.height = '100px';
         imagePreview.appendChild(thumbnail);
     }
-
     // Función para agregar detalles a la tabla
     function addToTable(src, datetime, latitude, longitude, count) {
         const table = document.getElementById('imageDetailsTable').getElementsByTagName('tbody')[0];
-            const newRow = table.insertRow();
+        const newRow = table.insertRow();
 
-    // Columna de miniatura
-    const cellThumbnail = newRow.insertCell(0);
-    const thumbnail = new Image();
-    thumbnail.src = src;
-    thumbnail.style.width = '50px';
-    cellThumbnail.appendChild(thumbnail);
+        // Columna de miniatura
+        const cellThumbnail = newRow.insertCell(0);
+        const thumbnail = new Image();
+        thumbnail.src = src;
+        thumbnail.style.width = '50px';
+        cellThumbnail.appendChild(thumbnail);
 
-    // Columnas de fecha, latitud, longitud y correlativo
-    newRow.insertCell(1).textContent = datetime;
-    newRow.insertCell(2).textContent = latitude;
-    newRow.insertCell(3).textContent = longitude;
-    newRow.insertCell(4).textContent = `Foto_${count}_${datetime.replaceAll(' ', '_').replaceAll(':', '').replaceAll('/', '')}`;
+        // Columnas de fecha, latitud, longitud y correlativo
+        newRow.insertCell(1).textContent = datetime;
+        newRow.insertCell(2).textContent = latitude;
+        newRow.insertCell(3).textContent = longitude;
+        newRow.insertCell(4).textContent = `Foto_${count}_${datetime.replaceAll(' ', '_').replaceAll(':', '').replaceAll('/', '')}`;
 
-    // Columna de selección de cultivo
-    const cropSelectCell = newRow.insertCell(5);
-    const cropSelect = document.createElement('select');
-    cropsList.forEach(crop => {
-        const option = document.createElement('option');
-        option.value = crop;
-        option.textContent = crop;
-        cropSelect.appendChild(option);
-    });
-    cropSelectCell.appendChild(cropSelect);
-}
+        // Columna de selección de cultivo
+        const cropSelectCell = newRow.insertCell(5);
+        const cropSelect = document.createElement('select');
+        cropsList.forEach(crop => {
+            const option = document.createElement('option');
+            option.value = crop;
+            option.textContent = crop;
+            cropSelect.appendChild(option);
+        });
+        cropSelectCell.appendChild(cropSelect);
+    }
 
-// Función para enviar la imagen a la API y manejar la respuesta
-sendToAPIButton.addEventListener('click', function() {
-    const currentImage = document.querySelector("#imageDetailsTable tbody tr:last-child img");
-    const currentRow = document.querySelector("#imageDetailsTable tbody tr:last-child");
-    const cropSelected = currentRow.cells[5].querySelector('select').value;
+    // Función para enviar la imagen a la API y manejar la respuesta
+    sendToAPIButton.addEventListener('click', function() {
+        const currentImage = document.querySelector("#imageDetailsTable tbody tr:last-child img");
+        const currentRow = document.querySelector("#imageDetailsTable tbody tr:last-child");
+        const cropSelected = currentRow.cells[5].querySelector('select').value;
 
-    if (currentImage && cropSelected) {
-        fetch(currentImage.src)
-            .then(res => res.blob())
-            .then(blob => {
-                const formData = new FormData();
-                formData.append('image', blob, 'image.png');
-                formData.append('crop', cropSelected);
+        if (currentImage && cropSelected) {
+            fetch(currentImage.src)
+                .then(res => res.blob())
+                .then(blob => {
+                    const formData = new FormData();
+                    formData.append('image', blob, 'image.png');
+                    formData.append('crop', cropSelected);
 
-                fetch('https://api.plantix.net/v2/image_analysis', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': '2b0080cfd58f564046a1104db36c9163091c2a07'
-                    },
-                    body: formData
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    addToEvaluationTable(currentRow.cells[4].textContent, data);
-                    displayStatusMessage("Conexión Establecida Exitosamente");
-                    document.getElementById('observationsTextarea').readOnly = true;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    displayStatusMessage('Error: ' + error.message);
+                    fetch('https://api.plantix.net/v2/image_analysis', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': '2b0080cfd58f564046a1104db36c9163091c2a07'
+                        },
+                        body: formData
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        addToEvaluationTable(currentRow.cells[4].textContent, data);
+                        displayStatusMessage("Conexión Establecida Exitosamente");
+                        document.getElementById('observationsTextarea').readOnly = true;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        displayStatusMessage('Error: ' + error.message);
+                    });
                 });
-            });
-    } else {
-        displayStatusMessage("No hay una imagen cargada o no se seleccionó un cultivo.");
-    }
-});
-
-function addToEvaluationTable(correlativo, apiData) {
-    const evalTable = document.getElementById('evaluationTable').getElementsByTagName('tbody')[0];
-    const newRow = evalTable.insertRow();
-
-    newRow.insertCell(0).textContent = /* Nombre Común */
-    newRow.insertCell(1).textContent = /* Nombre Científico */;
-    newRow.insertCell(2).textContent = /* Patógeno */;
-    newRow.insertCell(3).textContent = /* Probabilidad */;
-    newRow.insertCell(4).textContent = /* Tratamiento o Recomendación */;
-
-    const vfSelectCell = newRow.insertCell(5);
-    const vfSelect = document.createElement('select');
-    ["Verdadero", "Falso", "No lo sé"].forEach(optionText => {
-        const option = document.createElement('option');
-        option.value = optionText;
-        option.textContent = optionText;
-        vfSelect.appendChild(option);
+        } else {
+            displayStatusMessage("No hay una imagen cargada o no se seleccionó un cultivo.");
+        }
     });
-    vfSelectCell.appendChild(vfSelect);
-}
 
-function displayStatusMessage(message) {
-    const statusContainer = document.getElementById('statusContainer');
-    if (!statusContainer) {
-        const newStatusContainer = document.createElement('div');
-        newStatusContainer.id = 'statusContainer
-                newStatusContainer.style.color = 'blue';
-        newStatusContainer.textContent = message;
-        document.body.appendChild(newStatusContainer);
-    } else {
-        statusContainer.textContent = message;
+    function addToEvaluationTable(correlativo, apiData) {
+        const evalTable = document.getElementById('evaluationTable').getElementsByTagName('tbody')[0];
+        const newRow = evalTable.insertRow();
+
+        newRow.insertCell(0).textContent = /* Nombre Común */;
+        newRow.insertCell(1).textContent = /* Nombre Científico */;
+        newRow.insertCell(2).textContent = /* Patógeno */;
+        newRow.insertCell(3).textContent = /* Probabilidad */;
+        newRow.insertCell(4).textContent = /* Tratamiento o Recomendación */;
+
+        const vfSelectCell = newRow.insertCell(5);
+        const vfSelect = document.createElement('select');
+        ["Verdadero", "Falso", "No lo sé"].forEach(optionText => {
+            const option = document.createElement('option');
+            option.value = optionText;
+            option.textContent = optionText;
+            vfSelect.appendChild(option);
+        });
+        vfSelectCell.appendChild(vfSelect);
     }
-}
+
+    function displayStatusMessage(message) {
+        const statusContainer = document.getElementById('statusContainer');
+        if (!statusContainer) {
+            const newStatusContainer = document.createElement('div');
+            newStatusContainer.id = 'statusContainer';
+            newStatusContainer.style.color = 'blue';
+            newStatusContainer.textContent = message;
+            document.body.appendChild(newStatusContainer);
+        } else {
+            statusContainer.textContent = message;
+        }
+    }
 });
