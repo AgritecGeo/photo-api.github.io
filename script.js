@@ -168,7 +168,7 @@ function addToEvaluationTable(correlativo, apiData) {
     const evalTable = document.getElementById('evaluationTable').getElementsByTagName('tbody')[0];
     const newRow = evalTable.insertRow();
 
-    newRow.insertCell(0).textContent = /* Nombre Común */;
+    newRow.insertCell(0).textContent = /* Nombre Común */
     newRow.insertCell(1).textContent = /* Nombre Científico */;
     newRow.insertCell(2).textContent = /* Patógeno */;
     newRow.insertCell(3).textContent = /* Probabilidad */;
