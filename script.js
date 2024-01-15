@@ -1,8 +1,22 @@
 document.addEventListener("DOMContentLoaded", function() {
     let imageCount = 0; // Contador para el correlativo de imágenes
 
-    // Lista de cultivos en español (solo hortalizas, papa y café)
-    const cropsList = ["Hortaliza", "Papa", "Café"];
+    // Lista de cultivos en español con sus correspondientes valores en inglés
+    const cropsList = {
+        "Frijol": "Bean",
+        "Zanahoria": "Carrot",
+        "Repollo": "Cabbage",
+        "Coliflor": "Cauliflower",
+        "Pepino": "Cucumber",
+        "Berenjena": "Eggplant",
+        "Pimiento": "Pepper",
+        "Cebolla": "Onion",
+        "Papa": "Potato",
+        "Camote": "Sweet_Potato",
+        "Tomate": "Tomato",
+        "Zucchini": "Zucchini",
+        "Café": "Coffee"
+    };
 
     // Manejar carga de imagen
     document.getElementById('imageLoader').addEventListener('change', function(e) {
@@ -112,12 +126,12 @@ document.addEventListener("DOMContentLoaded", function() {
         // Columna de selección de cultivo
         const cropSelectCell = newRow.insertCell(5);
         const cropSelect = document.createElement('select');
-        cropsList.forEach(crop => {
+        for (const [cropName, cropValue] of Object.entries(cropsList)) {
             const option = document.createElement('option');
-            option.value = crop;
-            option.textContent = crop;
+            option.value = cropValue;
+            option.textContent = cropName;
             cropSelect.appendChild(option);
-        });
+        }
         cropSelectCell.appendChild(cropSelect);
     }
 
@@ -167,21 +181,19 @@ document.addEventListener("DOMContentLoaded", function() {
         const evalTable = document.getElementById('evaluationTable').getElementsByTagName('tbody')[0];
         const newRow = evalTable.insertRow();
 
-        newRow.insertCell(0).textContent = "Nombre Común";
-        newRow.insertCell(1).textContent = "Nombre Científico";
-        newRow.insertCell(2).textContent = "Patógeno";
-        newRow.insertCell(3).textContent = "Probabilidad";
-        newRow.insertCell(4).textContent = "Tratamiento o Recomendación";
-
-        const vfSelectCell = newRow.insertCell(5);
-        const vfSelect = document.createElement('select');
-        ["Verdadero", "Falso", "No lo sé"].forEach(optionText => {
-            const option = document.createElement('option');
-            option.value = optionText;
-            option.textContent = optionText;
-            vfSelect.appendChild(option);
-        });
-        vfSelectCell.appendChild(vfSelect);
+        // Agregar columnas con menús desplegables para calificar
+        const columnsToAdd = 5; // Cantidad de columnas en las que se requiere el menú desplegable
+        for (let i = 0; i < columnsToAdd; i++) {
+            const cell = newRow.insertCell(i);
+            const select = document.createElement('select');
+            ["Verdadero", "Falso", "No lo sé"].forEach(optionText => {
+                const option = document.createElement('option');
+                option.value = optionText;
+                option.textContent = optionText;
+                select.appendChild(option);
+            });
+            cell.appendChild(select);
+        }
     }
 
     function displayStatusMessage(message) {
