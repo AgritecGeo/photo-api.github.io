@@ -91,12 +91,13 @@ document.addEventListener("DOMContentLoaded", function () {
         thumbnail.style.height = '100px';
         imagePreview.appendChild(thumbnail);
     }
+
     // Función para agregar detalles a la tabla
     function addToTable(src, datetime, latitude, longitude, count) {
         const table = document.getElementById('imageDetailsTable').getElementsByTagName('tbody')[0];
         const newRow = table.insertRow();
 
-        // Columna de miniatura
+    // Columna de miniatura
         const cellThumbnail = newRow.insertCell(0);
         const thumbnail = new Image();
         thumbnail.src = src;
@@ -109,8 +110,9 @@ document.addEventListener("DOMContentLoaded", function () {
         newRow.insertCell(3).textContent = longitude;
         newRow.insertCell(4).textContent = `Foto_${count}_${datetime.replaceAll(' ', '_').replaceAll(':', '').replaceAll('/', '')}`;
 
-        // Columna de selección de cultivo
+        // Columna de selección de cultivo (oculta en móviles)
         const cropSelectCell = newRow.insertCell(5);
+        cropSelectCell.classList.add("hide-on-mobile");
         const cropSelect = document.createElement('select');
         cropsList.forEach(crop => {
             const option = document.createElement('option');
@@ -174,15 +176,17 @@ document.addEventListener("DOMContentLoaded", function () {
             newRow.insertCell(3).textContent = data.diagnosis_likelihood || '';
             newRow.insertCell(4).textContent = data.treatment_chemical || '';
 
-            const vfSelectCell = newRow.insertCell(5);
-            const vfSelect = document.createElement('select');
+            // Celda para menú desplegable de evaluación
+            const evalSelectCell = newRow.insertCell(5);
+            evalSelectCell.classList.add("hide-on-mobile");
+            const evalSelect = document.createElement('select');
             ["Verdadero", "Falso", "No lo sé"].forEach(optionText => {
                 const option = document.createElement('option');
                 option.value = optionText;
                 option.textContent = optionText;
-                vfSelect.appendChild(option);
+                evalSelect.appendChild(option);
             });
-            vfSelectCell.appendChild(vfSelect);
+            evalSelectCell.appendChild(evalSelect);
         });
     }
 
