@@ -159,21 +159,45 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(error => console.log('error', error));
     });
 
-    function addToEvaluationTable(apiData) {
+function addToEvaluationTable(apiData) {
         const evalTable = document.getElementById('evaluationTable').getElementsByTagName('tbody')[0];
+   
         apiData.forEach(data => {
             const newRow = evalTable.insertRow();
-            Object.values(data).forEach(value => {
-                const cell = newRow.insertCell();
-                const evalSelect = document.createElement('select');
-                ["Verdadero", "Falso", "No lo sé"].forEach(optionText => {
-                    const option = document.createElement('option');
-                    option.value = optionText;
-                    option.textContent = optionText;
-                    evalSelect.appendChild(option);
-                });
-                cell.appendChild(evalSelect);
+   
+            const fields = [
+                data.common_name,
+                data.scientific_name,
+                data.pathogen_class,
+                data.diagnosis_likelihood,
+                data.treatment_chemical
+            ];
+   
+            fields.forEach((field, index) => {
+                const cell = newRow.insertCell(index);
+               
+                // Crear un contenedor para el texto
+                const textDiv = document.createElement('div');
+                textDiv.textContent = field || '';
+                cell.appendChild(textDiv);
+   
+                // Crear y agregar el menú desplegable en un nuevo contenedor
+                const selectDiv = document.createElement('div');
+                const select = createDropdown(["Verdadero", "Falso", "No lo sé"]);
+                selectDiv.appendChild(select);
+                cell.appendChild(selectDiv);
             });
         });
+    }
+   
+    function createDropdown(options) {
+        const select = document.createElement('select');
+        options.forEach(optionText => {
+            const option = document.createElement('option');
+            option.value = optionText;
+            option.textContent = optionText;
+            select.appendChild(option);
+        });
+        return select;
     }
 });
