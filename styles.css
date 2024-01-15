@@ -13,7 +13,6 @@ body {
     min-height: 100vh;
 }
 
-
 .centered-container {
     text-align: center;
     width: 80%;
@@ -110,11 +109,33 @@ button:hover {
         max-width: 100%;
         height: auto;
     }
+
+    table {
+        display: block;
+        overflow-x: auto;
+    }
+
+    .text-inputs-section input,
+    .text-inputs-section textarea {
+        padding: 8px;
+    }
+
+    /* Ocultar columnas en móviles */
+    .hide-on-mobile {
+        display: none;
+    }
 }
 
 @media (max-width: 480px) {
     button, .custom-file-upload {
         width: 100%;
         margin: 10px 0;
+    }
+
+    .text-inputs-section label,
+    .text-inputs-section input,
+    .text-inputs-section select,
+    .text-inputs-section textarea {
+        font-size: 14px;
     }
 }
