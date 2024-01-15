@@ -98,80 +98,62 @@ document.addEventListener("DOMContentLoaded", function () {
         thumbnail.style.width = '100px';
         thumbnail.style.height = '100px';
         imagePreview.appendChild(thumbnail);
-        }
-    // Función para agregar detalles a la tabla
-function addToTable(src, datetime, latitude, longitude, count) {
-    const table = document.getElementById('imageDetailsTable').getElementsByTagName('tbody')[0];
-    const newRow = table.insertRow();
-
-    // Columna de miniatura
-    const cellThumbnail = newRow.insertCell(0);
-    const thumbnail = new Image();
-    thumbnail.src = src;
-    thumbnail.style.width = '50px';
-    cellThumbnail.appendChild(thumbnail);
-
-    // Columnas de fecha, latitud, longitud y correlativo
-    newRow.insertCell(1).textContent = datetime;
-    newRow.insertCell(2).textContent = latitude;
-    newRow.insertCell(3).textContent = longitude;
-    newRow.insertCell(4).textContent = `Foto_${count}_${datetime.replaceAll(' ', '_').replaceAll(':', '').replaceAll('/', '')}`;
-}
-
-var selecionado;
-document.getElementById('crop').addEventListener('change', function (parametro) {
-    selecionado = parametro.target.value;
-});
-
-// Función para enviar la imagen a la API y manejar la respuesta
-sendToAPIButton.addEventListener('click', function () {
-    const currentImage = document.querySelector("#imageDetailsTable tbody tr:last-child img");
-    const currentRow = document.querySelector("#imageDetailsTable tbody tr:last-child");
-
-    var formdata = new FormData();
-
-    // Obteniendo el archivo de imagen del elemento de carga de imagen
-    var imageLoader = document.getElementById('imageLoader');
-    if (imageLoader.files.length > 0) {
-        var file = imageLoader.files[0];
-        formdata.append("imagen", file, file.name);
     }
 
-    formdata.append("texto", selecionado);
+    // Función para agregar detalles a la tabla
+    function addToTable(src, datetime, latitude, longitude, count) {
+        const table = document.getElementById('imageDetailsTable').getElementsByTagName('tbody')[0];
+        const newRow = table.insertRow();
 
-    var requestOptions = {
-        method: 'POST',
-        body: formdata,
-        redirect: 'follow'
-    };
+        // Columna de miniatura
+        const cellThumbnail = newRow.insertCell(0);
+        const thumbnail = new Image();
+        thumbnail.src = src;
+        thumbnail.style.width = '50px';
+        cellThumbnail.appendChild(thumbnail);
 
-    fetch("https://us-central1-agritecgeo.cloudfunctions.net/plantix-api-function", requestOptions)
-        .then(response => response.json())
-        .then(data => {
-            if (Array.isArray(data)) {
-                addToEvaluationTable(data);
-            } else {
-                alert('Los datos recibidos no son un array', data);
-            }
-        })
-        .catch(error => console.log('error', error));
-});
+        // Columnas de fecha, latitud, longitud y correlativo
+        newRow.insertCell(1).textContent = datetime;
+        newRow.insertCell(2).textContent = latitude;
+        newRow.insertCell(3).textContent = longitude;
+        newRow.insertCell(4).textContent = `Foto_${count}_${datetime.replaceAll(' ', '_').replaceAll(':', '').replaceAll('/', '')}`;
+    }
 
-function addToEvaluationTable(apiData) {
-    const evalTable = document.getElementById('evaluationTable').getElementsByTagName('tbody')[0];
-    apiData.forEach(data => {
-        const newRow = evalTable.insertRow();
-        Object.values(data).forEach(value => {
-            const cell = newRow.insertCell();
-            const evalSelect = document.createElement('select');
-            ["Verdadero", "Falso", "No lo sé"].forEach(optionText => {
-                const option = document.createElement('option');
-                option.value = optionText;
-                option.textContent = optionText;
-                evalSelect.appendChild(option);
-            });
-            cell.appendChild(evalSelect);
-        });
+    var selecionado;
+    document.getElementById('crop').addEventListener('change', function (parametro) {
+        selecionado = parametro.target.value;
     });
-}
-});
+
+    // Función para enviar la imagen a la API y manejar la respuesta
+    sendToAPIButton.addEventListener('click', function () {
+        const currentImage = document.querySelector("#imageDetailsTable tbody tr:last-child img");
+        const currentRow = document.querySelector("#imageDetailsTable tbody tr:last-child");
+
+        var formdata = new FormData();
+
+        // Obteniendo el archivo de imagen del elemento de carga de imagen
+        var imageLoader = document.getElementById('imageLoader');
+        if (imageLoader.files.length > 0) {
+            var file = imageLoader.files[0];
+            formdata.append("imagen", file, file.name);
+        }
+
+        formdata.append("texto", selecionado);
+
+        var requestOptions = {
+            method: 'POST',
+            body: formdata,
+            redirect: 'follow'
+        };
+
+        fetch("https://us-central1-agritecgeo.cloudfunctions.net/plantix-api-function", requestOptions)
+            .then(response => response.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    addToEvaluationTable(data);
+                } else {
+                    alert('Los datos recibidos no son un array', data);
+                }
+            })
+            .catch(error => console.log('error', error));
+    });
