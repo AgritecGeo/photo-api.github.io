@@ -68,6 +68,7 @@ document.addEventListener("DOMContentLoaded", function () {
             callback(e.target.files[0]);
         }
     }
+
         // Función para agregar imágenes a la tabla
     function addImageToPreview(src) {
         const imagePreview = document.getElementById('imagePreview');
@@ -131,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         var formdata = new FormData();
 
-        // Obteniendo el archivo de imagen del elemento de carga de imagen
+                // Obteniendo el archivo de imagen del elemento de carga de imagen
         var imageLoader = document.getElementById('imageLoader');
         if (imageLoader.files.length > 0) {
             var file = imageLoader.files[0];
@@ -157,3 +158,22 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .catch(error => console.log('error', error));
     });
+
+    function addToEvaluationTable(apiData) {
+        const evalTable = document.getElementById('evaluationTable').getElementsByTagName('tbody')[0];
+        apiData.forEach(data => {
+            const newRow = evalTable.insertRow();
+            Object.values(data).forEach(value => {
+                const cell = newRow.insertCell();
+                const evalSelect = document.createElement('select');
+                ["Verdadero", "Falso", "No lo sé"].forEach(optionText => {
+                    const option = document.createElement('option');
+                    option.value = optionText;
+                    option.textContent = optionText;
+                    evalSelect.appendChild(option);
+                });
+                cell.appendChild(evalSelect);
+            });
+        });
+    }
+});
