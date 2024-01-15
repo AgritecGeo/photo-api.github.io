@@ -90,7 +90,8 @@ button:hover {
 }
 
 .text-inputs-section input,
-.text-inputs-section textarea {
+.text-inputs-section textarea,
+.text-inputs-section select {
     width: 100%;
     padding: 10px;
     margin-bottom: 10px;
@@ -116,7 +117,8 @@ button:hover {
     }
 
     .text-inputs-section input,
-    .text-inputs-section textarea {
+    .text-inputs-section textarea,
+    .text-inputs-section select {
         padding: 8px;
     }
 }
