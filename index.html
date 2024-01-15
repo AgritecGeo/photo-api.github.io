@@ -1,136 +1,99 @@
-/* Estilo general de la página */
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-image: url('https://filedn.com/lRAMUKU4tN3HUnQqI5npg4H/Plantix/Background/41ca9243-be8f-4b53-9afa-1a7961363874.png');
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación Visión Artificial</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="centered-container">
+        <h1>Módulo de Documentación</h1>
 
-.centered-container {
-    text-align: center;
-    width: 80%;
-    background-color: white;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    max-width: 960px;
-}
+        <!-- Sección de carga de imagen y toma de fotografía -->
+        <div class="image-upload-section">
+            <input type="file" id="imageLoader" name="imageLoader" accept="image/*" hidden/>
+            <label for="imageLoader" class="custom-file-upload">Subir Imagen</label>
+            <button id="cameraButton">Activar Cámara</button>
+            <video id="video" style="display:none;"></video>
+            <canvas id="canvas" style="display:none;"></canvas>
+            <button id="takePhotoButton" style="display:none;">Tomar Foto</button>
+            <button id="removePhotoButton" style="display:none;">Eliminar Foto</button>
+            <div id="imagePreview" class="image-preview"></div>
+        </div>
 
-/* Estilo para tablas */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-}
+        <!-- Tabla para mostrar detalles de las imágenes -->
+        <table id="imageDetailsTable">
+            <thead>
+                <tr>
+                    <th>Miniatura</th>
+                    <th>Fecha y Hora</th>
+                    <th>Latitud</th>
+                    <th>Longitud</th>
+                    <th>Correlativo</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
 
-th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
+                <!-- Casillas de texto después de la tabla -->
+        <div class="text-inputs-section">
+            <label for="clientInput">Cliente:</label>
+            <input type="text" id="clientInput" name="clientInput">
+            <label for="crop">Cultivo:</label>
+            <select id="crop" name="cropSelect">
+                <option value="default">Seleccione un Cultivo</option>
+                <option value="bean">Frijol</option>
+                <option value="carrot">Zanahoria</option>
+                <option value="cabbage">Repollo</option>
+                <option value="cauliflower">Coliflor</option>
+                <option value="cucumber">Pepino</option>
+                <option value="eggplant">Berenjena</option>
+                <option value="pepper">Pimiento</option>
+                <option value="onion">Cebolla</option>
+                <option value="potato">Papa</option>
+                <option value="sweetpotato">Camote</option>
+                <option value="tomato">Tomate</option>
+                <option value="zucchini">Zucchini</option>
+                <option value="coffee">Café</option>
+            </select>
+            <label for="observationsTextarea">Observaciones:</label>
+            <textarea id="observationsTextarea" name="observationsTextarea" rows="4"></textarea>
+        </div>
 
-th {
-    background-color: #007D60;
-    color: white;
-}
+        <!-- Botón para enviar la imagen a la API -->
+        <button id="sendAndDownloadButton">Enviar</button>
 
-tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
+        <!-- Módulo de Evaluación -->
+        <h2>Módulo de Evaluación</h2>
+        <table id="evaluationTable">
+            <thead>
+                <tr>
+                    <th>Nombre Común</th>
+                    <th>Nombre Científico</th>
+                    <th>Patógeno</th>
+                    <th>Probabilidad</th>
+                    <th>Tratamiento o Recomendación</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
 
-/* Estilo para botones y selectores */
-button, select {
-    padding: 10px;
-    margin: 10px;
-    cursor: pointer;
-}
+        <!-- Casilla de texto para observaciones en módulo de evaluación -->
+        <div class="text-inputs-section">
+            <label for="evaluationObservationsTextarea">Observaciones:</label>
+            <textarea id="evaluationObservationsTextarea" name="evaluationObservationsTextarea" rows="4"></textarea>
+        </div>
 
-button:hover {
-    background-color: #00563F;
-    color: white;
-}
+        <!-- Botón para guardar la evaluación -->
+        <button id="saveEvaluationButton">Guardar Evaluación</button>
+    </div>
 
-/* Estilo para la sección de carga de imágenes y toma de fotografía */
-.image-upload-section {
-    margin: 20px 0;
-    text-align: center;
-}
+    <!-- Contenedor para mensajes de estado -->
+    <div id="statusContainer"></div>
 
-.custom-file-upload {
-    padding: 10px;
-    margin: 10px;
-    background-color: #007D60;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.image-preview {
-    margin-top: 10px;
-    max-width: 300px;
-    max-height: 300px;
-    border: 1px solid #ddd;
-}
-
-/* Estilo para casillas de texto */
-.text-inputs-section {
-    margin-top: 20px;
-}
-
-.text-inputs-section label {
-    display: block;
-    margin-bottom: 5px;
-}
-
-.text-inputs-section input,
-.text-inputs-section textarea {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .centered-container {
-        width: 95%;
-        padding: 10px;
-    }
-
-    .image-preview {
-        max-width: 100%;
-        height: auto;
-    }
-
-    table {
-        display: block;
-        overflow-x: auto;
-    }
-
-    .text-inputs-section input,
-    .text-inputs-section textarea {
-        padding: 8px;
-    }
-}
-
-@media (max-width: 480px) {
-    button, .custom-file-upload {
-        width: 100%;
-        margin: 10px 0;
-    }
-
-    .text-inputs-section label,
-    .text-inputs-section input,
-    .text-inputs-section select,
-    .text-inputs-section textarea {
-        font-size: 14px;
-    }
-}
+    <script src="script.js"></script>
+</body>
+</html>
