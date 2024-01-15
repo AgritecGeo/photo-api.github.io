@@ -42,6 +42,23 @@
         <div class="text-inputs-section">
             <label for="clientInput">Cliente:</label>
             <input type="text" id="clientInput" name="clientInput">
+            <label for="clientInput">Cultivo:</label>
+            <select id="crop" name="cropSelect">
+                <option value="default">Seleccione un Cultivo</option>
+                <option value="bean">Frijol</option>
+                <option value="carrot">Zanahoria</option>
+                <option value="cabbage">Repollo</option>
+                <option value="cauliflower">Coliflor</option>
+                <option value="cucumber">Pepino</option>
+                <option value="eggplant">Berenjena</option>
+                <option value="pepper">Pimiento</option>
+                <option value="onion">Cebolla</option>
+                <option value="potato">Papa</option>
+                <option value="sweetpotato">Camote</option>
+                <option value="tomato">Tomate</option>
+                <option value="zucchini">Zucchini</option>
+                <option value="coffee">Cafe</option>
+            </select>
             <label for="observationsTextarea">Observaciones:</label>
             <textarea id="observationsTextarea" name="observationsTextarea" rows="4"></textarea>
         </div>
@@ -59,6 +76,7 @@
                     <th>Patógeno</th>
                     <th>Probabilidad</th>
                     <th>Tratamiento o Recomendación</th>
+                    <th>Evaluación</th>
                 </tr>
             </thead>
             <tbody>
