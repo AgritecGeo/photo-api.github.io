@@ -31,7 +31,6 @@
                     <th>Latitud</th>
                     <th>Longitud</th>
                     <th>Correlativo</th>
-                    <th class="hide-on-mobile">Cultivo</th>
                 </tr>
             </thead>
             <tbody>
@@ -42,7 +41,7 @@
         <div class="text-inputs-section">
             <label for="clientInput">Cliente:</label>
             <input type="text" id="clientInput" name="clientInput">
-            <label for="clientInput">Cultivo:</label>
+            <label for="crop">Cultivo:</label>
             <select id="crop" name="cropSelect">
                 <option value="default">Seleccione un Cultivo</option>
                 <option value="bean">Frijol</option>
@@ -66,7 +65,7 @@
         <!-- Botón para enviar la imagen a la API -->
         <button id="sendAndDownloadButton">Enviar</button>
 
-        <!-- Módulo de Evaluación -->
+                <!-- Módulo de Evaluación -->
         <h2>Módulo de Evaluación</h2>
         <table id="evaluationTable">
             <thead>
@@ -76,7 +75,6 @@
                     <th>Patógeno</th>
                     <th>Probabilidad</th>
                     <th>Tratamiento o Recomendación</th>
-                    <th class="hide-on-mobile">Evaluación</th>
                 </tr>
             </thead>
             <tbody>
