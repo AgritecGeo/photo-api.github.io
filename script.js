@@ -1,9 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     let imageCount = 0; // Contador para el correlativo de imágenes
 
-    // Lista de cultivos en español (solo hortalizas, papa y café)
-    const cropsList = ["Hortaliza", "Papa", "Café"];
-
     // Manejar carga de imagen
     document.getElementById('imageLoader').addEventListener('change', function (e) {
         handleImage(e, addImageToPreview);
@@ -17,6 +14,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const takePhotoButton = document.getElementById('takePhotoButton');
     const removePhotoButton = document.getElementById('removePhotoButton');
     const sendToAPIButton = document.getElementById('sendAndDownloadButton');
+    const clearImageButton = document.createElement('button');
+
+    clearImageButton.textContent = 'Eliminar Imagen y Datos';
+    clearImageButton.addEventListener('click', clearImageAndData);
+    document.getElementById('imagePreview').after(clearImageButton);
 
     // Activar cámara
     cameraButton.addEventListener('click', function () {
@@ -47,6 +49,13 @@ document.addEventListener("DOMContentLoaded", function () {
         imageCount--;
     });
 
+    // Función para limpiar imagen y datos de la tabla
+    function clearImageAndData() {
+        document.getElementById('imagePreview').innerHTML = '';
+        document.getElementById('imageDetailsTable').getElementsByTagName('tbody')[0].innerHTML = '';
+        imageCount = 0;
+    }
+
     // Función para manejar imágenes y agregar previsualización
     function handleImage(e, callback) {
         const reader = new FileReader();
@@ -59,8 +68,7 @@ document.addEventListener("DOMContentLoaded", function () {
             callback(e.target.files[0]);
         }
     }
-
-    // Función para agregar imágenes a la tabla
+        // Función para agregar imágenes a la tabla
     function addImageToPreview(src) {
         const imagePreview = document.getElementById('imagePreview');
         if (imagePreview.innerHTML != '') {
@@ -90,95 +98,71 @@ document.addEventListener("DOMContentLoaded", function () {
         thumbnail.style.width = '100px';
         thumbnail.style.height = '100px';
         imagePreview.appendChild(thumbnail);
-    }
-
+        }
     // Función para agregar detalles a la tabla
-    function addToTable(src, datetime, latitude, longitude, count) {
-        const table = document.getElementById('imageDetailsTable').getElementsByTagName('tbody')[0];
-        const newRow = table.insertRow();
+function addToTable(src, datetime, latitude, longitude, count) {
+    const table = document.getElementById('imageDetailsTable').getElementsByTagName('tbody')[0];
+    const newRow = table.insertRow();
 
     // Columna de miniatura
-        const cellThumbnail = newRow.insertCell(0);
-        const thumbnail = new Image();
-        thumbnail.src = src;
-        thumbnail.style.width = '50px';
-        cellThumbnail.appendChild(thumbnail);
+    const cellThumbnail = newRow.insertCell(0);
+    const thumbnail = new Image();
+    thumbnail.src = src;
+    thumbnail.style.width = '50px';
+    cellThumbnail.appendChild(thumbnail);
 
-        // Columnas de fecha, latitud, longitud y correlativo
-        newRow.insertCell(1).textContent = datetime;
-        newRow.insertCell(2).textContent = latitude;
-        newRow.insertCell(3).textContent = longitude;
-        newRow.insertCell(4).textContent = `Foto_${count}_${datetime.replaceAll(' ', '_').replaceAll(':', '').replaceAll('/', '')}`;
+    // Columnas de fecha, latitud, longitud y correlativo
+    newRow.insertCell(1).textContent = datetime;
+    newRow.insertCell(2).textContent = latitude;
+    newRow.insertCell(3).textContent = longitude;
+    newRow.insertCell(4).textContent = `Foto_${count}_${datetime.replaceAll(' ', '_').replaceAll(':', '').replaceAll('/', '')}`;
+}
 
-        // Columna de selección de cultivo (oculta en móviles)
-        const cropSelectCell = newRow.insertCell(5);
-        cropSelectCell.classList.add("hide-on-mobile");
-        const cropSelect = document.createElement('select');
-        cropsList.forEach(crop => {
-            const option = document.createElement('option');
-            option.value = crop;
-            option.textContent = crop;
-            cropSelect.appendChild(option);
-        });
-        cropSelectCell.appendChild(cropSelect);
+var selecionado;
+document.getElementById('crop').addEventListener('change', function (parametro) {
+    selecionado = parametro.target.value;
+});
+
+// Función para enviar la imagen a la API y manejar la respuesta
+sendToAPIButton.addEventListener('click', function () {
+    const currentImage = document.querySelector("#imageDetailsTable tbody tr:last-child img");
+    const currentRow = document.querySelector("#imageDetailsTable tbody tr:last-child");
+
+    var formdata = new FormData();
+
+    // Obteniendo el archivo de imagen del elemento de carga de imagen
+    var imageLoader = document.getElementById('imageLoader');
+    if (imageLoader.files.length > 0) {
+        var file = imageLoader.files[0];
+        formdata.append("imagen", file, file.name);
     }
 
-    var selecionado;
-    document.getElementById('crop').addEventListener('change', function (parametro) {
-        selecionado= parametro.target.value;
-    });
+    formdata.append("texto", selecionado);
 
-    // Función para enviar la imagen a la API y manejar la respuesta
-    sendToAPIButton.addEventListener('click', function () {
-        const currentImage = document.querySelector("#imageDetailsTable tbody tr:last-child img");
-        const currentRow = document.querySelector("#imageDetailsTable tbody tr:last-child");
-        const cropSelected = currentRow.cells[5].querySelector('select').value;
+    var requestOptions = {
+        method: 'POST',
+        body: formdata,
+        redirect: 'follow'
+    };
 
-        var formdata = new FormData();
+    fetch("https://us-central1-agritecgeo.cloudfunctions.net/plantix-api-function", requestOptions)
+        .then(response => response.json())
+        .then(data => {
+            if (Array.isArray(data)) {
+                addToEvaluationTable(data);
+            } else {
+                alert('Los datos recibidos no son un array', data);
+            }
+        })
+        .catch(error => console.log('error', error));
+});
 
-        // Obteniendo el archivo de imagen del elemento de carga de imagen
-        var imageLoader = document.getElementById('imageLoader');
-        if (imageLoader.files.length > 0) {
-            var file = imageLoader.files[0];
-            formdata.append("imagen", file, file.name);
-        }
-
-        formdata.append("texto", selecionado);
-
-        var requestOptions = {
-            method: 'POST',
-            body: formdata,
-            redirect: 'follow'
-        };
-
-        fetch("https://us-central1-agritecgeo.cloudfunctions.net/plantix-api-function", requestOptions)
-            .then(response => response.json())
-            .then(data => {
-                if (Array.isArray(data)) {
-                    addToEvaluationTable(data);
-                } else {
-                    alert('Los datos recibidos no son un array', data);
-                }
-            })
-            .catch(error => console.log('error', error));
-
-    });
-
-    function addToEvaluationTable(apiData) {
-        const evalTable = document.getElementById('evaluationTable').getElementsByTagName('tbody')[0];
-
-        apiData.forEach(data => {
-            const newRow = evalTable.insertRow();
-
-            newRow.insertCell(0).textContent = data.common_name || '';
-            newRow.insertCell(1).textContent = data.scientific_name || '';
-            newRow.insertCell(2).textContent = data.pathogen_class || '';
-            newRow.insertCell(3).textContent = data.diagnosis_likelihood || '';
-            newRow.insertCell(4).textContent = data.treatment_chemical || '';
-
-            // Celda para menú desplegable de evaluación
-            const evalSelectCell = newRow.insertCell(5);
-            evalSelectCell.classList.add("hide-on-mobile");
+function addToEvaluationTable(apiData) {
+    const evalTable = document.getElementById('evaluationTable').getElementsByTagName('tbody')[0];
+    apiData.forEach(data => {
+        const newRow = evalTable.insertRow();
+        Object.values(data).forEach(value => {
+            const cell = newRow.insertCell();
             const evalSelect = document.createElement('select');
             ["Verdadero", "Falso", "No lo sé"].forEach(optionText => {
                 const option = document.createElement('option');
@@ -186,20 +170,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 option.textContent = optionText;
                 evalSelect.appendChild(option);
             });
-            evalSelectCell.appendChild(evalSelect);
+            cell.appendChild(evalSelect);
         });
-    }
-
-    function displayStatusMessage(message) {
-        const statusContainer = document.getElementById('statusContainer');
-        if (!statusContainer) {
-            const newStatusContainer = document.createElement('div');
-            newStatusContainer.id = 'statusContainer';
-            newStatusContainer.style.color = 'blue';
-            newStatusContainer.textContent = message;
-            document.body.appendChild(newStatusContainer);
-        } else {
-            statusContainer.textContent = message;
-        }
-    }
+    });
+}
 });
