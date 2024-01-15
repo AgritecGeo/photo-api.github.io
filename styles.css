@@ -119,11 +119,6 @@ button:hover {
     .text-inputs-section textarea {
         padding: 8px;
     }
-
-    /* Ocultar columnas en móviles */
-    .hide-on-mobile {
-        display: none;
-    }
 }
 
 @media (max-width: 480px) {
