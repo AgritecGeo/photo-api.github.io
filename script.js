@@ -1,25 +1,11 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     let imageCount = 0; // Contador para el correlativo de imágenes
 
-    // Lista de cultivos en español con sus correspondientes valores en inglés
-    const cropsList = {
-        "Frijol": "Bean",
-        "Zanahoria": "Carrot",
-        "Repollo": "Cabbage",
-        "Coliflor": "Cauliflower",
-        "Pepino": "Cucumber",
-        "Berenjena": "Eggplant",
-        "Pimiento": "Pepper",
-        "Cebolla": "Onion",
-        "Papa": "Potato",
-        "Camote": "Sweet_Potato",
-        "Tomate": "Tomato",
-        "Zucchini": "Zucchini",
-        "Café": "Coffee"
-    };
+    // Lista de cultivos en español (solo hortalizas, papa y café)
+    const cropsList = ["Hortaliza", "Papa", "Café"];
 
     // Manejar carga de imagen
-    document.getElementById('imageLoader').addEventListener('change', function(e) {
+    document.getElementById('imageLoader').addEventListener('change', function (e) {
         handleImage(e, addImageToPreview);
     }, false);
 
@@ -30,12 +16,12 @@ document.addEventListener("DOMContentLoaded", function() {
     const cameraButton = document.getElementById('cameraButton');
     const takePhotoButton = document.getElementById('takePhotoButton');
     const removePhotoButton = document.getElementById('removePhotoButton');
-    const sendToAPIButton = document.getElementById('sendAndDownloadButton'); 
+    const sendToAPIButton = document.getElementById('sendAndDownloadButton');
 
     // Activar cámara
-    cameraButton.addEventListener('click', function() {
+    cameraButton.addEventListener('click', function () {
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+            navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
                 video.srcObject = stream;
                 video.play();
                 video.style.display = 'block';
@@ -46,16 +32,16 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     // Tomar foto
-    takePhotoButton.addEventListener('click', function() {
+    takePhotoButton.addEventListener('click', function () {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        handleImage({target: {files: [canvas.toDataURL('image/png')]}}, addImageToPreview);
+        handleImage({ target: { files: [canvas.toDataURL('image/png')] } }, addImageToPreview);
         removePhotoButton.style.display = 'block';
     });
 
     // Eliminar foto
-    removePhotoButton.addEventListener('click', function() {
+    removePhotoButton.addEventListener('click', function () {
         document.getElementById('imagePreview').innerHTML = '';
         removePhotoButton.style.display = 'none';
         imageCount--;
@@ -64,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Función para manejar imágenes y agregar previsualización
     function handleImage(e, callback) {
         const reader = new FileReader();
-        reader.onload = function(event) {
+        reader.onload = function (event) {
             callback(event.target.result);
         }
         if (e.target.files[0] instanceof Blob) {
@@ -87,11 +73,11 @@ document.addEventListener("DOMContentLoaded", function() {
         let longitude = '';
 
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
+            navigator.geolocation.getCurrentPosition(function (position) {
                 latitude = position.coords.latitude.toFixed(6);
                 longitude = position.coords.longitude.toFixed(6);
                 addToTable(src, datetime, latitude, longitude, imageCount);
-            }, function() {
+            }, function () {
                 addToTable(src, datetime, latitude, longitude, imageCount); // Si falla la geolocalización
             });
         } else {
@@ -126,74 +112,78 @@ document.addEventListener("DOMContentLoaded", function() {
         // Columna de selección de cultivo
         const cropSelectCell = newRow.insertCell(5);
         const cropSelect = document.createElement('select');
-        for (const [cropName, cropValue] of Object.entries(cropsList)) {
+        cropsList.forEach(crop => {
             const option = document.createElement('option');
-            option.value = cropValue;
-            option.textContent = cropName;
+            option.value = crop;
+            option.textContent = crop;
             cropSelect.appendChild(option);
-        }
+        });
         cropSelectCell.appendChild(cropSelect);
     }
 
+    var selecionado;
+    document.getElementById('crop').addEventListener('change', function (parametro) {
+        selecionado= parametro.target.value;
+    });
+
     // Función para enviar la imagen a la API y manejar la respuesta
-    sendToAPIButton.addEventListener('click', function() {
+    sendToAPIButton.addEventListener('click', function () {
         const currentImage = document.querySelector("#imageDetailsTable tbody tr:last-child img");
         const currentRow = document.querySelector("#imageDetailsTable tbody tr:last-child");
         const cropSelected = currentRow.cells[5].querySelector('select').value;
 
-        if (currentImage && cropSelected) {
-            fetch(currentImage.src)
-                .then(res => res.blob())
-                .then(blob => {
-                    const formData = new FormData();
-                    formData.append('image', blob, 'image.png');
-                    formData.append('crop', cropSelected);
+        var formdata = new FormData();
 
-                    fetch('https://api.plantix.net/v2/image_analysis', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': '2b0080cfd58f564046a1104db36c9163091c2a07'
-                        },
-                        body: formData
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        addToEvaluationTable(currentRow.cells[4].textContent, data);
-                        displayStatusMessage("Conexión Establecida Exitosamente");
-                        document.getElementById('observationsTextarea').readOnly = true;
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        displayStatusMessage('Error: ' + error.message);
-                    });
-                });
-        } else {
-            displayStatusMessage("No hay una imagen cargada o no se seleccionó un cultivo.");
+        // Obteniendo el archivo de imagen del elemento de carga de imagen
+        var imageLoader = document.getElementById('imageLoader');
+        if (imageLoader.files.length > 0) {
+            var file = imageLoader.files[0];
+            formdata.append("imagen", file, file.name);
         }
+
+        formdata.append("texto", selecionado);
+
+        var requestOptions = {
+            method: 'POST',
+            body: formdata,
+            redirect: 'follow'
+        };
+
+        fetch("https://us-central1-agritecgeo.cloudfunctions.net/plantix-api-function", requestOptions)
+            .then(response => response.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    addToEvaluationTable(data);
+                } else {
+                    alert('Los datos recibidos no son un array', data);
+                }
+            })
+            .catch(error => console.log('error', error));
+
     });
 
-    function addToEvaluationTable(correlativo, apiData) {
+    function addToEvaluationTable(apiData) {
         const evalTable = document.getElementById('evaluationTable').getElementsByTagName('tbody')[0];
-        const newRow = evalTable.insertRow();
 
-        // Agregar columnas con menús desplegables para calificar
-        const columnsToAdd = 5; // Cantidad de columnas en las que se requiere el menú desplegable
-        for (let i = 0; i < columnsToAdd; i++) {
-            const cell = newRow.insertCell(i);
-            const select = document.createElement('select');
+        apiData.forEach(data => {
+            const newRow = evalTable.insertRow();
+
+            newRow.insertCell(0).textContent = data.common_name || '';
+            newRow.insertCell(1).textContent = data.scientific_name || '';
+            newRow.insertCell(2).textContent = data.pathogen_class || '';
+            newRow.insertCell(3).textContent = data.diagnosis_likelihood || '';
+            newRow.insertCell(4).textContent = data.treatment_chemical || '';
+
+            const vfSelectCell = newRow.insertCell(5);
+            const vfSelect = document.createElement('select');
             ["Verdadero", "Falso", "No lo sé"].forEach(optionText => {
                 const option = document.createElement('option');
                 option.value = optionText;
                 option.textContent = optionText;
-                select.appendChild(option);
+                vfSelect.appendChild(option);
             });
-            cell.appendChild(select);
-        }
+            vfSelectCell.appendChild(vfSelect);
+        });
     }
 
     function displayStatusMessage(message) {
