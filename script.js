@@ -208,6 +208,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(error => console.log('error', error));
     });
 
+    /*
     // Función para agregar datos a la tabla de evaluación
     function addToEvaluationTable(apiData) {
         const evalTable = document.getElementById('evaluationTable').getElementsByTagName('tbody')[0];
@@ -238,18 +239,8 @@ document.addEventListener("DOMContentLoaded", function () {
             selectCell.appendChild(select);
         });
     }
+    */
 
-    // Traducir valores de probabilidad al español
-    function translateProbability(probability) {
-        const translations = {
-            "very_likely": "Muy probable",
-            "likely": "Probable",
-            "possible": "Posible",
-            "unlikely": "Improbable",
-            "very_unlikely": "Muy improbable"
-        };
-        return translations[probability] || probability;
-    }
 
     // Función para crear menús desplegables
     function createDropdown(options) {
@@ -262,72 +253,31 @@ document.addEventListener("DOMContentLoaded", function () {
         });
         return select;
     }
-    // Continuación del código...
-
-    // Función para enviar la imagen a la API y manejar la respuesta
-    sendToAPIButton.addEventListener('click', function () {
-        const currentImage = document.querySelector("#imageDetailsTable tbody tr:last-child img");
-        const currentRow = document.querySelector("#imageDetailsTable tbody tr:last-child");
-
-        var formdata = new FormData();
-
-        // Obteniendo el archivo de imagen del elemento de carga de imagen
-        var imageLoader = document.getElementById('imageLoader');
-        if (imageLoader.files.length > 0) {
-            var file = imageLoader.files[0];
-            formdata.append("imagen", file, file.name);
-        }
-
-        formdata.append("texto", selecionado);
-
-        var requestOptions = {
-            method: 'POST',
-            body: formdata,
-            redirect: 'follow'
-        };
-
-        fetch("https://us-central1-agritecgeo.cloudfunctions.net/plantix-api-function", requestOptions)
-            .then(response => response.json())
-            .then(data => {
-                if (Array.isArray(data)) {
-                    addToEvaluationTable(data);
-                } else {
-                    alert('Los datos recibidos no son un array', data);
-                }
-            })
-            .catch(error => console.log('error', error));
-    });
-
+    
     // Función para agregar datos a la tabla de evaluación
     function addToEvaluationTable(apiData) {
         const evalTable = document.getElementById('evaluationTable').getElementsByTagName('tbody')[0];
 
-        // Remover la columna de 'Tratamiento o Recomendación' si existe
-        const headerRow = document.querySelector("#evaluationTable thead tr");
-        if (headerRow.cells.length > 4) {
-            headerRow.deleteCell(4); // Asumiendo que es la última columna
-        }
-
         apiData.forEach(data => {
             const newRow = evalTable.insertRow();
 
-            const fields = [
-                data.common_name,
-                data.scientific_name,
-                data.pathogen_class,
-                translateProbability(data.diagnosis_likelihood)
-            ];
+            newRow.insertCell(0).textContent = data.common_name || '';
+            newRow.insertCell(1).textContent = data.scientific_name || '';
+            newRow.insertCell(2).textContent = data.pathogen_class || '';
+            newRow.insertCell(3).textContent = data.diagnosis_likelihood || '';
 
-            fields.forEach((field, index) => {
-                newRow.insertCell(index).textContent = field;
+            const vfSelectCell = newRow.insertCell(4);
+            const vfSelect = document.createElement('select');
+            ["Verdadero", "Falso", "No lo sé"].forEach(optionText => {
+                const option = document.createElement('option');
+                option.value = optionText;
+                option.textContent = optionText;
+                vfSelect.appendChild(option);
             });
-
-            // Agregar menú desplegable al final de cada fila
-            const selectCell = newRow.insertCell(fields.length);
-            const select = createDropdown(["Verdadero", "Falso", "No lo sé"]);
-            selectCell.appendChild(select);
+            vfSelectCell.appendChild(vfSelect);
         });
     }
+    
 
     // Traducir valores de probabilidad al español
     function translateProbability(probability) {
@@ -341,6 +291,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return translations[probability] || probability;
     }
 
+    /*
     // Función para crear menús desplegables
     function createDropdown(options) {
         const select = document.createElement('select');
@@ -352,4 +303,5 @@ document.addEventListener("DOMContentLoaded", function () {
         });
         return select;
     }
+    */
 });
