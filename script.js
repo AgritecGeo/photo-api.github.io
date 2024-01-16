@@ -266,7 +266,7 @@ document.addEventListener("DOMContentLoaded", function () {
             newRow.insertCell(0).textContent = data.common_name || '';
             newRow.insertCell(1).textContent = data.scientific_name || '';
             newRow.insertCell(2).textContent = data.pathogen_class || '';
-            newRow.insertCell(3).textContent = data.diagnosis_likelihood || '';
+            newRow.insertCell(3).textContent = translateProbability(data.diagnosis_likelihood) || '';
 
             const vfSelectCell = newRow.insertCell(4);
             const vfSelect = document.createElement('select');
