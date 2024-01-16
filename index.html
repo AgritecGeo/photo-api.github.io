@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Evaluación Visión Artificial</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
+    
     <div class="centered-container">
         <h1>Módulo de Documentación</h1>
 
@@ -39,9 +42,10 @@
 
         <!-- Casillas de texto después de la tabla -->
         <div class="text-inputs-section">
-            <label for="clientInput">Identificación del Punto de Muestreo:</label>
+            <label for="clientInput">Cliente:</label>
             <input type="text" id="clientInput" name="clientInput">
 
+            
             <label for="crop">Cultivo:</label>
             <select id="crop" name="cropSelect">
                 <option value="default">Seleccione un Cultivo</option>
@@ -58,10 +62,9 @@
                 <option value="tomato">Tomate</option>
                 <option value="zucchini">Zucchini</option>
                 <option value="coffee">Café</option>
-                <!-- Opciones de cultivos -->
             </select>
             
-            <label for="observationsTextarea">Diagnóstico Inicial:</label>
+            <label for="observationsTextarea">Observaciones:</label>
             <textarea id="observationsTextarea" name="observationsTextarea" rows="4"></textarea>
         </div>
 
@@ -77,6 +80,7 @@
                     <th>Nombre Científico</th>
                     <th>Patógeno</th>
                     <th>Probabilidad</th>
+                    <th>Evaluación</th>
                     <!-- Columna 'Tratamiento o Recomendación' eliminada -->
                 </tr>
             </thead>
@@ -98,5 +102,7 @@
     <div id="statusContainer"></div>
 
     <script src="script.js"></script>
+    <script src="firebase.js"></script>
 </body>
+
 </html>
