@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
             personSelect.add(option);
         });
     }
-
+    
     // Evento para actualizar el menú desplegable de personas cuando se cambia el país
     countrySelect.addEventListener('change', function () {
         updatePersonSelect(this.value);
@@ -45,7 +45,21 @@ document.addEventListener("DOMContentLoaded", function () {
     const clientInput = document.getElementById('clientInput');
     clientInput.after(countrySelect, personSelect);
 
-    // Manejar carga de imagen
+    var countryLabel = document.createElement("label");
+    countryLabel.textContent = "Seleccionar País: ";
+
+    // Obtén el elemento del menú desplegable de países por su ID
+    var countrySelect1 = document.getElementById("countrySelect");
+
+    // Agrega la etiqueta antes del menú desplegable
+    countrySelect1.before(countryLabel);
+
+    var personLabel = document.createElement("label");
+    personLabel.textContent = "Seleccionar Persona: ";
+
+    var personSelect1 = document.getElementById("personSelect");
+    personSelect1.before(personLabel);
+
     document.getElementById('imageLoader').addEventListener('change', function (e) {
         handleImage(e, addImageToPreview);
     }, false);
@@ -177,9 +191,11 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('observationsTextarea').disabled = true;
         document.getElementById('countrySelect').disabled = true;
         document.getElementById('personSelect').disabled = true;
-
+        document.getElementById('crop').disabled = true;
+ 
         const currentImage = document.querySelector("#imageDetailsTable tbody tr:last-child img");
         const currentRow = document.querySelector("#imageDetailsTable tbody tr:last-child");
+ 
 
         var formdata = new FormData();
 
@@ -209,39 +225,6 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .catch(error => console.log('error', error));
     });
-
-    /*
-    // Función para agregar datos a la tabla de evaluación
-    function addToEvaluationTable(apiData) {
-        const evalTable = document.getElementById('evaluationTable').getElementsByTagName('tbody')[0];
-
-        // Remover la columna de 'Tratamiento o Recomendación' si existe
-        const headerRow = document.querySelector("#evaluationTable thead tr");
-        if (headerRow.cells.length > 4) {
-            headerRow.deleteCell(4); // Asumiendo que es la última columna
-        }
-
-        apiData.forEach(data => {
-            const newRow = evalTable.insertRow();
-
-            const fields = [
-                data.common_name,
-                data.scientific_name,
-                data.pathogen_class,
-                translateProbability(data.diagnosis_likelihood)
-            ];
-
-            fields.forEach((field, index) => {
-                newRow.insertCell(index).textContent = field;
-            });
-
-            // Agregar menú desplegable al final de cada fila
-            const selectCell = newRow.insertCell(fields.length);
-            const select = createDropdown(["Verdadero", "Falso", "No lo sé"]);
-            selectCell.appendChild(select);
-        });
-    }
-    */
 
 
     // Función para crear menús desplegables
@@ -280,7 +263,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
     
-
     // Traducir valores de probabilidad al español
     function translateProbability(probability) {
         const translations = {
@@ -293,17 +275,82 @@ document.addEventListener("DOMContentLoaded", function () {
         return translations[probability] || probability;
     }
 
-    /*
-    // Función para crear menús desplegables
-    function createDropdown(options) {
-        const select = document.createElement('select');
-        options.forEach(optionText => {
-            const option = document.createElement('option');
-            option.value = optionText;
-            option.textContent = optionText;
-            select.appendChild(option);
-        });
-        return select;
+    document.getElementById('saveEvaluationButton').addEventListener('click', function() {
+        // Generar un ID único para la sesión de datos
+        const uniqueID = `ID_${new Date().getTime()}`;
+     
+        // Recolectar datos comunes
+        const clientInput = document.getElementById('clientInput').value;
+        const country = document.getElementById('countrySelect').value;
+        const person = document.getElementById('personSelect').value;
+        const crop = document.getElementById('crop').value;
+        const observationsDoc = document.getElementById('observationsTextarea').value;
+     
+        // Recolectar datos de la tabla de Documentación
+        const docData = [];
+        const docRows = document.getElementById('imageDetailsTable').getElementsByTagName('tbody')[0].rows;
+        for (let i = 0; i < docRows.length; i++) {
+            const row = docRows[i];
+            docData.push({
+                id: uniqueID,
+                fechaHora: row.cells[1].textContent,
+                latitud: row.cells[2].textContent,
+                longitud: row.cells[3].textContent,
+                correlativo: row.cells[4].textContent,
+                cliente: clientInput,
+                pais: country,
+                persona: person,
+                cultivo: crop,
+                observaciones: observationsDoc
+            });
+        }
+     
+     
+        // Recolectar datos de la tabla de Evaluación
+        const evaluationData = [];
+        const evalRows = document.getElementById('evaluationTable').getElementsByTagName('tbody')[0].rows;
+        for (let i = 0; i < evalRows.length; i++) {
+            const row = evalRows[i];
+            evaluationData.push({
+                id: uniqueID, // Mismo ID que el módulo de documentación
+                commonName: row.cells[0].textContent,
+                scientificName: row.cells[1].textContent,
+                pathogen: row.cells[2].textContent,
+                probability: row.cells[3].textContent,
+                evaluation: row.cells[4].querySelector('select').value,
+                observationsEval: document.getElementById('evaluationObservationsTextarea').value
+            });
+        }
+     
+        // Crear objeto de datos para enviar
+        const dataToSave = {
+            documentacion: docData,
+            evaluacion: evaluationData
+        };
+     
+        // Convertir los datos a formato JSON
+        const jsonData = JSON.stringify(dataToSave, null, 2);
+     
+        // Obtener la fecha y hora actual para el nombre del archivo
+        const now = new Date();
+        const dateString = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
+        const timeString = `${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}`;
+     
+        // Generar el nombre del archivo incluyendo el ID único
+        const filename = `evaluacion_${dateString}_${timeString}_${uniqueID}.json`;
+     
+        // Crear y descargar el archivo JSON
+        downloadJSON(jsonData, filename);
+    });
+     
+    function downloadJSON(jsonData, filename) {
+        const blob = new Blob([jsonData], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
     }
-    */
+     
 });
