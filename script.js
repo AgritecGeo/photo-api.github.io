@@ -341,39 +341,11 @@ document.addEventListener("DOMContentLoaded", function () {
      
         // Crear y descargar el archivo JSON
         downloadJSON(jsonData, filename);
-
-        // Asume que ya has recopilado todos los datos necesarios en variables
-        const data = {
-            id: 'ID', // Reemplaza con tus datos reales
-            fechaHora: 'FechaHora',
-            latitud: 'Latitud',
-            longitud: 'Longitud',
-            correlativo: 'Correlativo',
-            cliente: 'Cliente',
-            pais: 'Pais',
-            persona: 'Persona',
-            cultivo: 'Cultivo',
-            observaciones: 'ObservacionDoc',
-            commonName: 'NombreComun',
-            scientificName: 'NombreCientifico',
-            pathogen: 'Patogeno',
-            probability: 'Probabilidad',
-            evaluation: 'Evaluacion',
-            observationsEval: 'ObservacionEval'
-        };
-    
-        // Envía los datos al servidor PHP mediante una solicitud POST
-        fetch('https://github.com/AgritecGeo/photo-api.github.io/blob/main/processing.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(data => console.log('Datos enviados con éxito', data))
-        .catch(error => console.error('Error:', error));
-
+        Swal.fire({
+            title: "¡Bien hecho!",
+            text: "Datos ingresados correctamente",
+            icon: "success"
+          });
     });
      
     function downloadJSON(jsonData, filename) {
