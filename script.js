@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
     countrySelect1.before(countryLabel);
 
     var personLabel = document.createElement("label");
-    personLabel.textContent = "Seleccionar Persona: ";
+    personLabel.textContent = "Evaluador:";
 
     var personSelect1 = document.getElementById("personSelect");
     personSelect1.before(personLabel);
