@@ -175,6 +175,8 @@ document.addEventListener("DOMContentLoaded", function () {
         // Bloquear edición de campos
         document.getElementById('clientInput').disabled = true;
         document.getElementById('observationsTextarea').disabled = true;
+        document.getElementById('countrySelect').disabled = true;
+        document.getElementById('personSelect').disabled = true;
 
         const currentImage = document.querySelector("#imageDetailsTable tbody tr:last-child img");
         const currentRow = document.querySelector("#imageDetailsTable tbody tr:last-child");
