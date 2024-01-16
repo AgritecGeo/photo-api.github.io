@@ -37,26 +37,24 @@
             </tbody>
         </table>
 
-                <!-- Casillas de texto después de la tabla -->
+        <!-- Casillas de texto después de la tabla -->
         <div class="text-inputs-section">
             <label for="clientInput">Cliente:</label>
             <input type="text" id="clientInput" name="clientInput">
+
+            <!-- Menús desplegables para países y personas -->
+            <label for="countrySelect">País:</label>
+            <select id="countrySelect" name="countrySelect">
+                <!-- Las opciones se agregarán dinámicamente con JavaScript -->
+            </select>
+            <label for="personSelect">Persona:</label>
+            <select id="personSelect" name="personSelect">
+                <!-- Las opciones se actualizarán dinámicamente según el país seleccionado -->
+            </select>
+
             <label for="crop">Cultivo:</label>
             <select id="crop" name="cropSelect">
-                <option value="default">Seleccione un Cultivo</option>
-                <option value="bean">Frijol</option>
-                <option value="carrot">Zanahoria</option>
-                <option value="cabbage">Repollo</option>
-                <option value="cauliflower">Coliflor</option>
-                <option value="cucumber">Pepino</option>
-                <option value="eggplant">Berenjena</option>
-                <option value="pepper">Pimiento</option>
-                <option value="onion">Cebolla</option>
-                <option value="potato">Papa</option>
-                <option value="sweetpotato">Camote</option>
-                <option value="tomato">Tomate</option>
-                <option value="zucchini">Zucchini</option>
-                <option value="coffee">Café</option>
+                <!-- Opciones de cultivos -->
             </select>
             <label for="observationsTextarea">Observaciones:</label>
             <textarea id="observationsTextarea" name="observationsTextarea" rows="4"></textarea>
@@ -74,7 +72,7 @@
                     <th>Nombre Científico</th>
                     <th>Patógeno</th>
                     <th>Probabilidad</th>
-                    <th>Tratamiento o Recomendación</th>
+                    <!-- Columna 'Tratamiento o Recomendación' eliminada -->
                 </tr>
             </thead>
             <tbody>
