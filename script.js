@@ -183,7 +183,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById('crop').addEventListener('change', function (parametro) {
         selecionado = parametro.target.value;
     });
-
+    var tiempo;
     // Evento para manejar el envío de datos y bloquear edición
     sendToAPIButton.addEventListener('click', function () {
         // Bloquear edición de campos
@@ -192,6 +192,8 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('countrySelect').disabled = true;
         document.getElementById('personSelect').disabled = true;
         document.getElementById('crop').disabled = true;
+        document.getElementById('severity').disabled = true;
+        document.getElementById('sendAndDownloadButton').disabled = true;
  
         const currentImage = document.querySelector("#imageDetailsTable tbody tr:last-child img");
         const currentRow = document.querySelector("#imageDetailsTable tbody tr:last-child");
@@ -214,17 +216,41 @@ document.addEventListener("DOMContentLoaded", function () {
             redirect: 'follow'
         };
 
+        Swal.fire({
+            title: 'Cargando...',
+            text: 'Por favor, espera.',
+            willOpen: () => {
+                Swal.showLoading()
+            },
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            allowEnterKey: false
+        });
+
         fetch("https://us-central1-agritecgeo.cloudfunctions.net/plantix-api-function", requestOptions)
-            .then(response => response.json())
-            .then(data => {
-                if (Array.isArray(data)) {
-                    addToEvaluationTable(data);
+        .then(response => response.json())
+        .then(data => {
+            try {
+                // Convertir la cadena en la propiedad 'result' a un objeto JavaScript
+                const resultArray = JSON.parse(data.result);
+                tiempo = JSON.parse(data.tiempo_respuesta);
+
+                // Verificar si 'resultArray' es realmente un arreglo
+                if (Array.isArray(resultArray)) {
+                    addToEvaluationTable(resultArray);
+                    Swal.close();
                 } else {
-                    alert('Los datos recibidos no son un array', data);
+                    alert('Los datos recibidos en "result" no son un array.');
                 }
-            })
-            .catch(error => console.log('error', error));
-    });
+            } catch (error) {
+                // Manejar errores, por ejemplo, si 'result' no es una cadena JSON válida
+                console.error('Error al analizar la respuesta de la API:', error);
+                alert('Hubo un error al procesar la respuesta de la API.');
+            }
+        })
+        .catch(error => console.log('error', error));     
+        });
+        
 
 
     // Función para crear menús desplegables
@@ -284,6 +310,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const country = document.getElementById('countrySelect').value;
         const person = document.getElementById('personSelect').value;
         const crop = document.getElementById('crop').value;
+        const severity = document.getElementById('severity').value;
         const observationsDoc = document.getElementById('observationsTextarea').value;
      
         // Recolectar datos de la tabla de Documentación
@@ -301,6 +328,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 pais: country,
                 persona: person,
                 cultivo: crop,
+                severidad: severity,
+                tiempo_consulta: tiempo, 
                 observaciones: observationsDoc
             });
         }
@@ -338,16 +367,58 @@ document.addEventListener("DOMContentLoaded", function () {
      
         // Generar el nombre del archivo incluyendo el ID único
         const filename = `evaluacion_${dateString}_${timeString}_${uniqueID}.json`;
-     
-        // Crear y descargar el archivo JSON
-        downloadJSON(jsonData, filename);
+        
+        // Envio de JSon a API de Cloud Fnctions
+
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        
+        var file = jsonData;
+        
+        var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: file,
+            redirect: 'follow'
+        };
         Swal.fire({
-            title: "¡Bien hecho!",
-            text: "Datos ingresados correctamente",
-            icon: "success"
-          });
+            title: 'Cargando...',
+            text: 'Por favor, espera.',
+            willOpen: () => {
+                Swal.showLoading()
+            },
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            allowEnterKey: false
+        });    
+
+        fetch("https://us-central1-agritecgeo.cloudfunctions.net/update-data-plantix", requestOptions)
+            .then(response => response.text())
+            .then(result => {
+                console.log(result);
+                if (result === "Archivos guardados correctamente") {
+                    Swal.close();
+                    Swal.fire({
+                        title: "¡Bien hecho!",
+                        text: "Datos ingresados correctamente",
+                        icon: "success"
+                    });
+
+
+                } else {
+                    // Opcional: manejar otros tipos de respuestas
+                    console.log("La respuesta de la API no es la esperada.");
+                }
+            })
+            .catch(error => console.log('error', error));
+        
     });
      
+        
+    function loadingIcon(){
+   
+    }
+
     function downloadJSON(jsonData, filename) {
         const blob = new Blob([jsonData], { type: "application/json" });
         const url = URL.createObjectURL(blob);
