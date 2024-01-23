@@ -12,7 +12,6 @@ document.addEventListener("DOMContentLoaded", function () {
         "Honduras": ["Marcial Valeriano", "Ronel Zuniga", "Jorge Abastida", "Raul Amador", "Franklin Meza", "David Castro", "Carlos Amador", "Milton Peña", "Eduard Barahona", "Neri Reyes"],
         "Nicaragua": ["Alfredo Salomón Sanchez", "Ariel Antonio Rivera Rodriguez", "Boanerges Ismael Cardoza Ballesteros", "Byron Gutierrez Montenegro", "Carlos Ramón Gomez Ponce", "Erick Esquivel Altamirano", "Gabriel Alejandro Garcia", "Kevin Soza Peralta", "Lester Orlando Iglesias Altamirano", "Liuxmilia Jaxari Rivera Umanzor", "Luis Alfonso Lopez Collado", "Luis Jason Jiron", "Oscar Danilo Ubeda Pineda", "Yader Augusto Rizo Rivera"],
         "Panamá": ["Nayesli Mendez", "Rosmel Bosque", "Euribiades Broce", "Erain Oses", "Melvin Murillo", "Juan Castillo", "Miguel Martinez", "Cristel Caballero", "Yasmary Medina"],
-        // Agrega aquí los demás países y personas
     };
 
     // Agregar opciones a los menús desplegables
@@ -370,17 +369,17 @@ document.addEventListener("DOMContentLoaded", function () {
         
         // Envio de JSon a API de Cloud Fnctions
 
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        
-        var file = jsonData;
+        var formdata = new FormData();
+        const fileInput = document.getElementById('imageLoader');
+        formdata.append("data", jsonData);
+        formdata.append("imagen", fileInput.files[0]);
         
         var requestOptions = {
             method: 'POST',
-            headers: myHeaders,
-            body: file,
+            body: formdata,
             redirect: 'follow'
-        };
+          };
+          
         Swal.fire({
             title: 'Cargando...',
             text: 'Por favor, espera.',
@@ -406,7 +405,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
                 } else {
-                    // Opcional: manejar otros tipos de respuestas
                     console.log("La respuesta de la API no es la esperada.");
                 }
             })
@@ -414,10 +412,6 @@ document.addEventListener("DOMContentLoaded", function () {
         
     });
      
-        
-    function loadingIcon(){
-   
-    }
 
     function downloadJSON(jsonData, filename) {
         const blob = new Blob([jsonData], { type: "application/json" });
