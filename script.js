@@ -63,6 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
         handleImage(e, addImageToPreview);
     }, false);
 
+   
     // Configuración de la cámara y botones
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
@@ -77,7 +78,8 @@ document.addEventListener("DOMContentLoaded", function () {
     clearImageButton.addEventListener('click', clearImageAndData);
     document.getElementById('imagePreview').after(clearImageButton);
 
-    // Activar cámara
+     /*
+    // Activar cámara Antiguo
     cameraButton.addEventListener('click', function () {
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
@@ -86,6 +88,27 @@ document.addEventListener("DOMContentLoaded", function () {
                 video.style.display = 'block';
                 takePhotoButton.style.display = 'block';
                 removePhotoButton.style.display = 'none';
+            });
+        }
+    });
+    */
+
+    // Activar cámara
+    cameraButton.addEventListener('click', function () {
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            // Configuración para preferir la cámara trasera en dispositivos móviles
+            var constraints = {
+                video: { facingMode: "environment" }
+            };
+    
+            navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
+                video.srcObject = stream;
+                video.play();
+                video.style.display = 'block';
+                takePhotoButton.style.display = 'block';
+                removePhotoButton.style.display = 'none';
+            }).catch(function (error) {
+                console.log("Error al acceder a la cámara: ", error);
             });
         }
     });
