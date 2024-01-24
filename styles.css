@@ -28,6 +28,13 @@ body {
     cursor: pointer;
 }
 
+#video {
+    width: 70%; /* Ajusta el ancho según tus necesidades */
+    height: auto; /* Esto mantendrá la proporción del video */
+    margin: 0 auto; /* Centra el video horizontalmente */
+    display: block; /* Asegúrate de que el video se muestre como un bloque */
+}
+
 .centered-container {
     text-align: center;
     width: 80%;
