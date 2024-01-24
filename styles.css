@@ -13,6 +13,20 @@ body {
     min-height: 100vh;
 }
 
+#takePhotoButton {
+    position: absolute;
+    bottom: 20px; /* Ajusta según sea necesario */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    padding: 10px 20px;
+    font-size: 16px; /* Ajusta según sea necesario */
+    color: #fff; /* Ajusta según sea necesario */
+    background-color: #007bff; /* Ajusta según sea necesario */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
 
 .centered-container {
     text-align: center;
