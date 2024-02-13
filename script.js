@@ -78,21 +78,6 @@ document.addEventListener("DOMContentLoaded", function () {
     clearImageButton.addEventListener('click', clearImageAndData);
     document.getElementById('imagePreview').after(clearImageButton);
 
-     /*
-    // Activar cámara Antiguo
-    cameraButton.addEventListener('click', function () {
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
-                video.srcObject = stream;
-                video.play();
-                video.style.display = 'block';
-                takePhotoButton.style.display = 'block';
-                removePhotoButton.style.display = 'none';
-            });
-        }
-    });
-    */
-
     // Activar cámara
     cameraButton.addEventListener('click', function () {
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -205,6 +190,27 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById('crop').addEventListener('change', function (parametro) {
         selecionado = parametro.target.value;
     });
+
+    function traducirError(mensajeError) {
+        const erroresTraducidos = {
+            "There was a problem authenticating your request. Check the authentication credentials for the requested resource.": "Se ha producido un problema al autenticar la solicitud. Compruebe las credenciales de autenticación del recurso solicitado.",
+            "File type not supported; permitted: 'jpeg', 'jpg', 'png', 'heic'.": "No se admite el tipo de archivo; Permitido: 'JPEG', 'JPG', 'PNG', 'HEIC'.",
+            "You have reached your maximum quota for requests this month. Please contact info@plantix.net for more information.": "Ha alcanzado su cuota máxima de solicitudes este mes. Póngase en contacto con info@plantix.net para obtener más información.",
+            "There are issues with our servers. This has been logged and we are working to fix it.": "Hay problemas con nuestros servidores. Esto se ha registrado y estamos trabajando para solucionarlo.",
+            "Potential issues with the image were detected. Check the image_feedback object for more information.": "Se detectaron posibles problemas con la imagen. Consulte el objeto image_feedback para obtener más información.",
+            "Potential issues with the image were detected. Please check the image_feedback object response": "Se detectaron posibles problemas con la imagen. Compruebe la respuesta del objeto image_feedback",
+            "Potential issues with the image were detected. Check the image_feedback object for more information.": "Se detectaron posibles problemas con la imagen. Consulte el objeto image_feedback para obtener más información.",
+            "Potential issues with the image were detected. Non-plant detected.": "Se detectaron posibles problemas con la imagen. No se detecta ninguna planta.",
+            "A crop was detected, but is not currently supported by our API.": "Se detectó un cultivo, pero actualmente no es compatible con nuestra API.",
+            "Potential issues with the image were detected. This plant is ornamental.": "Se detectaron posibles problemas con la imagen. Esta planta es ornamental.",
+            "Plantix was not able to recognise the symptoms in this image. It's likely that this particular problem is not yet supported.": "Plantix no fue capaz de reconocer los síntomas en esta imagen. Es probable que este problema en particular aún no se admita."
+        };
+
+        return erroresTraducidos[mensajeError] || mensajeError;
+    }
+
+
+
     var tiempo;
     // Evento para manejar el envío de datos y bloquear edición
     sendToAPIButton.addEventListener('click', function () {
@@ -253,10 +259,17 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(response => response.json())
         .then(data => {
             try {
+                const resultError = traducirError(JSON.parse(data.errors));
+                if (resultError.length > 0) {
+                    alert(traducirError(resultError[0].message)); // Asumiendo que 'message' es la clave que contiene el mensaje de error
+                    window.location.reload();
+                    return; // Salir de la función para evitar más procesamiento
+                }
+    
                 // Convertir la cadena en la propiedad 'result' a un objeto JavaScript
                 const resultArray = JSON.parse(data.result);
                 tiempo = JSON.parse(data.tiempo_respuesta);
-
+    
                 // Verificar si 'resultArray' es realmente un arreglo
                 if (Array.isArray(resultArray)) {
                     addToEvaluationTable(resultArray);
@@ -268,9 +281,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 // Manejar errores, por ejemplo, si 'result' no es una cadena JSON válida
                 console.error('Error al analizar la respuesta de la API:', error);
                 alert('Hubo un error al procesar la respuesta de la API.');
+                window.location.reload();
             }
         })
-        .catch(error => console.log('error', error));     
+        .catch(error => console.log('error', error));   
         });
         
 
@@ -425,8 +439,6 @@ document.addEventListener("DOMContentLoaded", function () {
                         text: "Datos ingresados correctamente",
                         icon: "success"
                     });
-
-
                 } else {
                     console.log("La respuesta de la API no es la esperada.");
                 }
@@ -435,6 +447,8 @@ document.addEventListener("DOMContentLoaded", function () {
         
     });
      
+
+
 
     function downloadJSON(jsonData, filename) {
         const blob = new Blob([jsonData], { type: "application/json" });
