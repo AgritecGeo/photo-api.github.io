@@ -14,6 +14,8 @@ document.addEventListener("DOMContentLoaded", function () {
         "Panamá": ["Nayesli Mendez", "Rosmel Bosque", "Euribiades Broce", "Erain Oses", "Melvin Murillo", "Juan Castillo", "Miguel Martinez", "Cristel Caballero", "Yasmary Medina"],
     };
 
+    const uniqueID = `ID_${new Date().getTime()}`;
+
     // Agregar opciones a los menús desplegables
     countrySelect.id = "countrySelect";
     Object.keys(countries).forEach(country => {
@@ -134,6 +136,18 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    const optionsDate = { 
+        timeZone: 'America/Guatemala', 
+        year: 'numeric', 
+        month: '2-digit', 
+        day: '2-digit', 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit' 
+    };
+
+    const datetimel = new Date().toLocaleString('es-GT', optionsDate);
+
     // Función para agregar imágenes a la tabla
     function addImageToPreview(src) {
         const imagePreview = document.getElementById('imagePreview');
@@ -141,8 +155,9 @@ document.addEventListener("DOMContentLoaded", function () {
             return; // Evitar agregar más de una imagen
         }
 
+        
         imageCount++;
-        const datetime = new Date().toLocaleString();
+        const datetime = datetimel;
         let latitude = '';
         let longitude = '';
 
@@ -209,10 +224,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return erroresTraducidos[mensajeError] || mensajeError;
     }
 
-
-
     var tiempo;
-    // Evento para manejar el envío de datos y bloquear edición
     sendToAPIButton.addEventListener('click', function () {
         // Bloquear edición de campos
         document.getElementById('clientInput').disabled = true;
@@ -222,6 +234,11 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('crop').disabled = true;
         document.getElementById('severity').disabled = true;
         document.getElementById('sendAndDownloadButton').disabled = true;
+
+        const clientInput = document.getElementById('clientInput').value;
+        const country = document.getElementById('countrySelect').value;
+        const person = document.getElementById('personSelect').value;
+        const crop = document.getElementById('crop').value;
  
         const currentImage = document.querySelector("#imageDetailsTable tbody tr:last-child img");
         const currentRow = document.querySelector("#imageDetailsTable tbody tr:last-child");
@@ -237,6 +254,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         formdata.append("texto", selecionado);
+        formdata.append("cliente", clientInput);
+        formdata.append("pais", country);
+        formdata.append("persona", person);
+        formdata.append("cultivo", crop);
+        formdata.append("id", uniqueID);
+        formdata.append("fecha", datetimel);
 
         var requestOptions = {
             method: 'POST',
@@ -254,6 +277,7 @@ document.addEventListener("DOMContentLoaded", function () {
             allowEscapeKey: false,
             allowEnterKey: false
         });
+        
 
         fetch("https://us-central1-agritecgeo.cloudfunctions.net/plantix-api-function", requestOptions)
         .then(response => response.json())
@@ -262,7 +286,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const resultError = traducirError(JSON.parse(data.errors));
                 if (resultError.length > 0) {
                     alert(traducirError(resultError[0].message)); // Asumiendo que 'message' es la clave que contiene el mensaje de error
-                    window.location.reload();
+                    //window.location.reload();
                     return; // Salir de la función para evitar más procesamiento
                 }
     
@@ -285,21 +309,9 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         })
         .catch(error => console.log('error', error));   
-        });
+
+    });
         
-
-
-    // Función para crear menús desplegables
-    function createDropdown(options) {
-        const select = document.createElement('select');
-        options.forEach(optionText => {
-            const option = document.createElement('option');
-            option.value = optionText;
-            option.textContent = optionText;
-            select.appendChild(option);
-        });
-        return select;
-    }
     
     // Función para agregar datos a la tabla de evaluación
     function addToEvaluationTable(apiData) {
@@ -339,7 +351,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.getElementById('saveEvaluationButton').addEventListener('click', function() {
         // Generar un ID único para la sesión de datos
-        const uniqueID = `ID_${new Date().getTime()}`;
+        //const uniqueID = `ID_${new Date().getTime()}`;
      
         // Recolectar datos comunes
         const clientInput = document.getElementById('clientInput').value;
