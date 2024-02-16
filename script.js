@@ -286,7 +286,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const resultError = traducirError(JSON.parse(data.errors));
                 if (resultError.length > 0) {
                     alert(traducirError(resultError[0].message)); // Asumiendo que 'message' es la clave que contiene el mensaje de error
-                    //window.location.reload();
+                    window.location.reload();
                     return; // Salir de la función para evitar más procesamiento
                 }
     
