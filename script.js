@@ -279,7 +279,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
         
 
-        fetch("https://us-central1-agritecgeo.cloudfunctions.net/plantix-api-function", requestOptions)
+        fetch("https://us-central1-agritecgeo-analytics.cloudfunctions.net/plantix-communication", requestOptions)
         .then(response => response.json())
         .then(data => {
             try {
@@ -440,7 +440,7 @@ document.addEventListener("DOMContentLoaded", function () {
             allowEnterKey: false
         });    
 
-        fetch("https://us-central1-agritecgeo.cloudfunctions.net/update-data-plantix", requestOptions)
+        fetch("https://us-central1-agritecgeo-analytics.cloudfunctions.net/plantix-update-info", requestOptions)
             .then(response => response.text())
             .then(result => {
                 console.log(result);
